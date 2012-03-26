@@ -1,0 +1,1 @@
+cmd_drivers/gpu/pvr/built-in.o :=  /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/gpu/pvr/built-in.o drivers/gpu/pvr/pvr_common.o drivers/gpu/pvr/sgx.o drivers/gpu/pvr/omaplfb.o drivers/gpu/pvr/pvr540.o 

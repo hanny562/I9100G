@@ -1,0 +1,5 @@
+kernel/drivers/staging/omap_hsi/hsi_char.ko
+kernel/drivers/staging/ti-st/st_drv.ko
+kernel/drivers/staging/ti-st/bt_drv.ko
+kernel/drivers/staging/ti-st/fm_drv.ko
+kernel/drivers/staging/ti-st/gps_drv.ko

@@ -1,0 +1,3 @@
+kernel/samsung/fm_si4709/Si4709_driver.ko
+kernel/samsung/param/param.ko
+kernel/samsung/vibetonz/vibetonz.ko

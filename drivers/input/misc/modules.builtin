@@ -1,0 +1,2 @@
+kernel/drivers/input/misc/samsung_omap4_pwrbutton.ko
+kernel/drivers/input/misc/uinput.ko

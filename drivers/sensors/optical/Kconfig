@@ -1,0 +1,30 @@
+#
+# Optical Sensor Configuration
+#
+
+config OPTICAL
+	bool "Optical Sensor"
+	default n
+	help
+	  This option enables proximity & light sensors
+
+config OPTICAL_ISL29023
+	depends on OPTICAL
+	tristate "Ambient Light Sensor driver"
+	default n
+	help
+	  This option enables light sensors using isl29023.
+
+config OPTICAL_GP2A
+        depends on OPTICAL
+        tristate "Proximity/Ambient Light Sensor Driver"
+        default n 
+        help
+         This Option enbales  proximity/light sensor using gp2a.
+         
+config INPUT_CM3663
+	depends on I2C && GENERIC_GPIO
+	tristate "Capella CM3663 ambient light and proximity sensor"
+	default n
+	help
+	  This option enables proximity & light sensors using CM3663 driver.         

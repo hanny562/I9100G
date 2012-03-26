@@ -1,0 +1,13 @@
+obj-$(CONFIG_OMAP2_DSS) += omapdss.o
+omapdss-y := core.o dss.o dispc.o display.o manager.o overlay.o wb.o fifothreshold.o
+omapdss-$(CONFIG_OMAP2_DSS_DPI) += dpi.o
+omapdss-$(CONFIG_OMAP2_DSS_RFBI) += rfbi.o
+omapdss-$(CONFIG_OMAP2_DSS_VENC) += venc.o
+omapdss-$(CONFIG_OMAP2_DSS_SDI) += sdi.o
+omapdss-$(CONFIG_OMAP2_DSS_DSI) += dsi.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += hdmi.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += edid.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += hdcp_ddc.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += hdcp_lib.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += hdcp_sha1.o
+omapdss-$(CONFIG_OMAP2_DSS_HDMI) += hdcp_top.o

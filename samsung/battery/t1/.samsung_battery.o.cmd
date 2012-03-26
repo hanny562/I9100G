@@ -1,0 +1,1 @@
+cmd_samsung/battery/t1/samsung_battery.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o samsung/battery/t1/samsung_battery.o samsung/battery/t1/battery_monitor.o samsung/battery/t1/charger_ss6000.o samsung/battery/t1/fuelgauge_max17043.o 

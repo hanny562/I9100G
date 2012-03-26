@@ -1,0 +1,4 @@
+kernel/drivers/sensors/core/sensors_core.ko
+kernel/drivers/sensors/mpu3050/mpu3050.ko
+kernel/drivers/sensors/mpu3050/timerirq.ko
+kernel/drivers/sensors/optical/cm3663.ko

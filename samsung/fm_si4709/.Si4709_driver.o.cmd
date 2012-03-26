@@ -1,0 +1,1 @@
+cmd_samsung/fm_si4709/Si4709_driver.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o samsung/fm_si4709/Si4709_driver.o samsung/fm_si4709/Si4709_dev.o samsung/fm_si4709/Si4709_i2c_drv.o samsung/fm_si4709/Si4709_main.o 

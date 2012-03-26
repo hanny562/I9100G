@@ -1,0 +1,1 @@
+cmd_crypto/pcbc.ko := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL -r  -T /home/hanny/kernel/Lucifr/scripts/module-common.lds --build-id -o crypto/pcbc.ko crypto/pcbc.o crypto/pcbc.mod.o

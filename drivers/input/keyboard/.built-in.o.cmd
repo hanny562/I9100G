@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/built-in.o :=  /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/input/keyboard/built-in.o drivers/input/keyboard/cypress/cypress-touchkey.o drivers/input/keyboard/cypress/issp_driver_routines.o drivers/input/keyboard/cypress/issp_main.o drivers/input/keyboard/cypress/issp_routines.o 

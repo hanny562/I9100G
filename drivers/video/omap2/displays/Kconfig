@@ -1,0 +1,99 @@
+menu "OMAP2/3 Display Device Drivers"
+        depends on OMAP2_DSS
+
+config PANEL_GENERIC
+        tristate "Generic Panel"
+	default y
+        help
+	  Generic panel driver.
+	  Used for DVI output for Beagle and OMAP3 SDP.
+
+config PANEL_SAMSUNG_LTN121AT
+        tristate "Samsung LTN121AT LCD TFT Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used on Samsung Universal OMAP4 board
+
+
+config PANEL_SAMSUNG_D10E50T6332
+        tristate "Samsung D10E50T6332 LCD TFT Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used on Samsung Universal Rev 0.3 OMAP4 board
+
+config PANEL_IMGSENSOR_CMC623
+        tristate "Samsung CMC623 based LCD TFT Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used in P4Adobe OMAP4 board
+
+config PANEL_SHARP_LS037V7DW01
+        tristate "Sharp LS037V7DW01 LCD Panel"
+        depends on OMAP2_DSS
+	default y
+        select BACKLIGHT_CLASS_DEVICE
+        help
+          LCD Panel used in TI's SDP3430 and EVM boards
+
+config PANEL_SHARP_LQ043T1DG01
+        tristate "Sharp LQ043T1DG01 LCD Panel"
+        depends on OMAP2_DSS
+        help
+
+          LCD Panel used in TI's OMAP3517 EVM boards
+
+config PANEL_PICO_DLP
+        tristate "OMAP PICO DLP Panel"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used in TI's SDP4430 and EVM boards
+
+config PANEL_TAAL
+        tristate "Taal DSI Panel"
+        depends on OMAP2_DSS_DSI
+        help
+          Taal DSI command mode panel from TPO.
+
+config PANEL_NEC_NL8048HL11_01B
+        tristate "NEC NL8048HL11-01B Panel"
+	depends on OMAP2_DSS
+	default y
+        help
+          LCD Panel used in the Zoom boards
+
+config PANEL_TOPPOLY_TDO35S
+        tristate "Toppoly TDO35S LCD Panel support"
+        depends on OMAP2_DSS
+        help
+          LCD Panel used in CM-T35
+
+config PANEL_TPO_TD043MTEA1
+        tristate "TPO TD043MTEA1 LCD Panel"
+        depends on OMAP2_DSS && SPI
+        help
+          LCD Panel used in OMAP3 Pandora
+
+config PANEL_ACX565AKM
+	tristate "ACX565AKM Panel"
+	depends on OMAP2_DSS_SDI
+	select BACKLIGHT_CLASS_DEVICE
+	help
+	  This is the LCD panel used on Nokia N900
+
+config PANEL_AMS353
+        tristate "AMS353 Panel"
+        help
+          LCD Panel used in the OMAP4
+          
+config PANEL_LD9040
+        tristate "LD9040 Panel"
+		select LCD_CLASS_DEVICE
+		select SPI
+        help
+          This enables support for Samsung LD9040 LCD panel
+          
+config PANEL_S6E8AA0
+       tristate "S6E8AA0 MIPI LCD"
+       help
+         This enables support for Samsung S6E8AA0 MIPI LCD       
+endmenu

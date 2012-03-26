@@ -1,0 +1,1 @@
+cmd_drivers/misc/built-in.o :=  /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/misc/built-in.o drivers/misc/pmem.o drivers/misc/kernel_debugger.o drivers/misc/uid_stat.o drivers/misc/eeprom/built-in.o drivers/misc/cb710/built-in.o drivers/misc/akm8975.o drivers/misc/twl6030-pwroff.o drivers/misc/omap4_duty_cycle.o 

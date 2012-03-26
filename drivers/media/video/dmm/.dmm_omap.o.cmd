@@ -1,0 +1,1 @@
+cmd_drivers/media/video/dmm/dmm_omap.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/media/video/dmm/dmm_omap.o drivers/media/video/dmm/dmm.o drivers/media/video/dmm/tmm_pat.o 
