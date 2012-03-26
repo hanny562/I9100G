@@ -1,1 +1,0 @@
-cmd_drivers/dsp/syslink/multicore_ipc/syslink_platform.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/dsp/syslink/multicore_ipc/syslink_platform.o drivers/dsp/syslink/multicore_ipc/platform_mem.o 

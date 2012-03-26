@@ -1,1 +1,0 @@
-cmd_drivers/sensors/mpu3050/built-in.o :=  /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/sensors/mpu3050/built-in.o drivers/sensors/mpu3050/mpu3050.o drivers/sensors/mpu3050/timerirq.o 

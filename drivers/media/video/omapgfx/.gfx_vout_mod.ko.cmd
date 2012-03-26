@@ -1,1 +1,0 @@
-cmd_drivers/media/video/omapgfx/gfx_vout_mod.ko := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL -r  -T /home/hanny/kernel/Lucifr/scripts/module-common.lds --build-id -o drivers/media/video/omapgfx/gfx_vout_mod.ko drivers/media/video/omapgfx/gfx_vout_mod.o drivers/media/video/omapgfx/gfx_vout_mod.mod.o

@@ -1,1 +1,0 @@
-cmd_drivers/dsp/syslink/procmgr/proc4430/syslink_proc4430.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/dsp/syslink/procmgr/proc4430/syslink_proc4430.o drivers/dsp/syslink/procmgr/proc4430/proc4430.o drivers/dsp/syslink/procmgr/proc4430/proc4430_drv.o 

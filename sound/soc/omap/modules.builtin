@@ -1,9 +1,0 @@
-kernel/sound/soc/omap/snd-soc-omap-abe.ko
-kernel/sound/soc/omap/snd-soc-omap.ko
-kernel/sound/soc/omap/snd-soc-omap-dmic.ko
-kernel/sound/soc/omap/snd-soc-omap-mcbsp.ko
-kernel/sound/soc/omap/snd-soc-omap-mcpdm.ko
-kernel/sound/soc/omap/snd-soc-omap-hdmi.ko
-kernel/sound/soc/omap/snd-soc-omap-abe-dsp.ko
-kernel/sound/soc/omap/snd-soc-sdp4430.ko
-kernel/sound/soc/omap/abe/snd-soc-abe-hal.ko

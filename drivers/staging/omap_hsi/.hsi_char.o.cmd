@@ -1,1 +1,0 @@
-cmd_drivers/staging/omap_hsi/hsi_char.o := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/staging/omap_hsi/hsi_char.o drivers/staging/omap_hsi/hsi-char.o drivers/staging/omap_hsi/hsi-if.o 

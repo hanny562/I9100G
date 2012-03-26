@@ -1,1 +1,0 @@
-cmd_drivers/media/video/tiler/tcm/built-in.o :=  /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL    -r -o drivers/media/video/tiler/tcm/built-in.o drivers/media/video/tiler/tcm/tcm_sita.o 

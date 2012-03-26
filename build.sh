@@ -16,7 +16,7 @@ echo "Compiling Kernel"
 make -j2 CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 
 # Copy Kernel Image
-rm -f $KERNEL_PATH/releasetools/zip/$KBUILD_BUILD_VERSION.zip
+rm -f $KERNEL_PATH/release/zip/$KBUILD_BUILD_VERSION.zip
 cp -f $KERNEL_PATH/arch/arm/boot/zImage .
 cp -f $KERNEL_PATH/arch/arm/boot/zImage $KERNEL_PATH/releasetools/zip
 
@@ -24,10 +24,10 @@ cd arch/arm/boot
 tar cf $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar ../../../zImage && ls -lh $KBUILD_BUILD_VERSION.tar
 
 cd ../../..
-cd releasetools/zip
+cd release/zip
 zip -r $KBUILD_BUILD_VERSION.zip *
 
-cp $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar $KERNEL_PATH/releasetools/tar/$KBUILD_BUILD_VERSION.tar
+cp $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar $KERNEL_PATH/releases/tar/$KBUILD_BUILD_VERSION.tar
 rm $KERNEL_PATH/arch/arm/boot/$KBUILD_BUILD_VERSION.tar
-rm $KERNEL_PATH/releasetools/zip/zImage
+rm $KERNEL_PATH/release/zip/zImage
 

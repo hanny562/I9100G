@@ -1,1 +1,0 @@
-cmd_samsung/vibetonz/vibetonz.ko := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL -r  -T /home/hanny/kernel/Lucifr/scripts/module-common.lds --build-id -o samsung/vibetonz/vibetonz.ko samsung/vibetonz/vibetonz.o samsung/vibetonz/vibetonz.mod.o

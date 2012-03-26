@@ -1,4 +1,0 @@
-kernel/drivers/phone_svn/ipc_hsi/ipc_hsi.ko
-kernel/drivers/phone_svn/modemctl/modemctl.ko
-kernel/drivers/phone_svn/modemctl/portlist.ko
-kernel/drivers/phone_svn/svnet/svnet.ko

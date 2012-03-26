@@ -1,1 +1,0 @@
-cmd_drivers/staging/ti-st/st_drv.ko := /opt/toolchains/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL -r  -T /home/hanny/kernel/Lucifr/scripts/module-common.lds --build-id -o drivers/staging/ti-st/st_drv.ko drivers/staging/ti-st/st_drv.o drivers/staging/ti-st/st_drv.mod.o
