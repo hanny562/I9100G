@@ -123,6 +123,44 @@ config CPU_FREQ_DEFAULT_GOV_HOTPLUG
 	  support the hotplug governor. If unsure have a look at
 	  the help section of the driver. Fallback governor will be the
 	  performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_AGGRESSIVE
+	bool "aggressive"
+	select CPU_FREQ_GOV_AGGRESSIVE
+	help
+		A pimped out conservative governor.
+        	This features earlysuspend, hotplugging,
+        	and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRY
+	bool "gallimaufry"
+	select CPU_FREQ_GOV_GALLIMAUFRY
+	help
+	 A pimped out ondemand governor.
+         This features earlysuspend, hotplugging, a
+         2-phase algo, and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_INTERACTIVEX
+	bool "interactiveX"
+	select CPU_FREQ_GOV_INTERACTIVEX
+	help
+	  Use the CPUFreq governor 'interactiveX' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'interactiveX' governor for latency-sensitive workloads.
+	  Has sleep profile.
+
+config CPU_FREQ_DEFAULT_GOV_LIONHEART
+	bool "lionheart"
+	select CPU_FREQ_GOV_LIONHEART
+	help
+	  Use the CPUFreq governor 'Lionheart' as default.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASS2
+	bool "smartass2"
+	select CPU_FREQ_GOV_SMARTASS2
+	help
+	  Use the CPUFreq governor 'smartassV2' as default.
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -222,5 +260,49 @@ config CPU_FREQ_GOV_HOTPLUG
 	  'ondemand' instead.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_AGGRESSIVE
+	tristate "'aggressive' governor"
+  	depends on CPU_FREQ
+	help
+	   Help is a lie.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_GALLIMAUFRY
+	tristate "'gallimaufry' governor"
+  	depends on CPU_FREQ
+	help
+	   Help is a lie.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_INTERACTIVE
+	tristate "'interactive' cpufreq policy governor"
+	help
+	  'interactive' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
+
+config CPU_FREQ_GOV_LIONHEART
+	tristate "'Lionheart' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'Lionheart' - A brave and agile conservative-based governor.
+
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartassV2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'smartassV2' - a "smart" optimized governor for the pyra!
+
+config CPU_FREQ_MIN_TICKS
+	int "Ticks between governor polling interval."
+	default 10
+	help
+	   Minimum number of ticks between polling interval for governors.
+
+config CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER
+	int "Sampling rate multiplier for governors."
+	default 1000
+	help
+		Sampling latency rate multiplied by the cpu switch latency.
 
 endif	# CPU_FREQ
