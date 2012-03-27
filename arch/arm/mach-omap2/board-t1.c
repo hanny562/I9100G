@@ -271,18 +271,49 @@ static struct switch_dev switch_dock = {
 
 static void omap4_deskdock_cb(bool attached)
 {
-	if (attached)
+	union power_supply_propval value;
+	struct power_supply *psy = power_supply_get_by_name("sec-charger");
+	int ret;
+	
+	printk("\nBoard file [FSA9480]: DESK DOCK Callback \n");
+	
+	if (attached) {
 		switch_set_state(&switch_dock, 1);
-	else
+		value.intval = POWER_SUPPLY_TYPE_CARDOCK;
+	}
+	else {
 		switch_set_state(&switch_dock, 0);
+		value.intval = POWER_SUPPLY_TYPE_BATTERY;
+	}
+
+	if (psy) {
+		ret = psy->set_property(psy, POWER_SUPPLY_PROP_CHARGE_TYPE, &value);
+		if (ret)
+			printk("%s: fail to set power_supply property\n", __func__);
+	}
 }
 
 static void omap4_cardock_cb(bool attached)
 {
-	if (attached)
+	union power_supply_propval value;
+	struct power_supply *psy = power_supply_get_by_name("sec-charger");
+	int ret;
+	
+	printk("\nBoard file [FSA9480]: CARKIT Callback \n");
+
+	if (attached) {
 		switch_set_state(&switch_dock, 2);
-	else
+		value.intval = POWER_SUPPLY_TYPE_CARDOCK;
+	} else {
 		switch_set_state(&switch_dock, 0);
+		value.intval = POWER_SUPPLY_TYPE_BATTERY;
+	}
+	
+	if (psy) {
+		ret = psy->set_property(psy, POWER_SUPPLY_PROP_CHARGE_TYPE, &value);
+		if (ret)
+			printk("%s: fail to set power_supply property\n", __func__);
+	}
 }
 #endif
 
