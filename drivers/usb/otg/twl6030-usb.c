@@ -304,6 +304,7 @@ static irqreturn_t twl6030_usb_irq(int irq, void *_twl)
 				
 				pr_alert("usb_irq : disconnect\n");
 				cdev->mute_switch = 0;
+				schedule_work(&cdev->switch_work);
 				usb_gadget_disconnect(twl->otg.gadget);
 			}
 

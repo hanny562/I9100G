@@ -39,6 +39,9 @@
 #include <linux/slab.h>
 #include <linux/skbuff.h>
 #include <linux/netdevice.h>
+#ifdef ARP_OFFLOAD_SUPPORT
+#include <linux/inetdevice.h>
+#endif
 #include <linux/etherdevice.h>
 #include <linux/random.h>
 #include <linux/spinlock.h>
@@ -217,6 +220,15 @@ void wifi_del_dev(void)
 }
 #endif /* defined(CONFIG_MACH_GODIN) && defined(CONFIG_WIFI_CONTROL_FUNC) */
 
+#ifdef ARP_OFFLOAD_SUPPORT
+static int dhd_device_event(struct notifier_block *this,
+	unsigned long event,
+	void *ptr);
+
+static struct notifier_block dhd_notifier = {
+	.notifier_call = dhd_device_event
+};
+#endif /* ARP_OFFLOAD_SUPPORT */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)) && defined(CONFIG_PM_SLEEP)
 #include <linux/suspend.h>
@@ -447,7 +459,7 @@ uint dhd_roam_disable = 1;
 uint dhd_radio_up = 1;
 
 /* Network inteface name */
-char iface_name[IFNAMSIZ];
+char iface_name[IFNAMSIZ] = {0};
 module_param_string(iface_name, iface_name, IFNAMSIZ, 0);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0))
@@ -610,6 +622,24 @@ extern int register_pm_notifier(struct notifier_block *nb);
 extern int unregister_pm_notifier(struct notifier_block *nb);
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)) && defined(CONFIG_PM_SLEEP) */
 	/* && defined(DHD_GPL) */
+
+#ifdef WHITELIST_PKT_FILTER
+bool dhd_is_p2p_if_on(dhd_pub_t * dhdp)
+{
+	struct dhd_info *dhd=dhdp->info;		//Shinuk
+	int i;
+
+	DHD_ERROR(("%s %d Enter\n",  __FUNCTION__, __LINE__));
+
+	for(i=0; i<DHD_MAX_IFS;i++)
+	{
+		if(dhd->iflist[i] && strncmp(dhd->iflist[i]->name, "p2p", 3)==0)
+			return TRUE;
+	}
+	return FALSE;
+}
+#endif
+
 void dhd_set_packet_filter(int value, dhd_pub_t *dhd)
 {
 #ifdef PKT_FILTER_SUPPORT
@@ -619,7 +649,19 @@ void dhd_set_packet_filter(int value, dhd_pub_t *dhd)
 	if (dhd_pkt_filter_enable) {
 		int i;
 
+#ifdef WHITELIST_PKT_FILTER
+		bool p2p_if_on=dhd_is_p2p_if_on(dhd);
+#endif /* WHITELIST_PKT_FILTER */
 		for (i = 0; i < dhd->pktfilter_count; i++) {
+#ifdef WHITELIST_PKT_FILTER
+			//In case p2p interface is not up, exclude arp from pktfiltering whitelist.
+			//Otherwise, arp request packets will wake the host up even with arp offload enabled.
+			if(!p2p_if_on && i==2) {
+				DHD_ERROR(("%s %d exclude ARP from whitelist packet filtering\n",  __FUNCTION__, __LINE__));
+				continue;
+			}
+#endif /* WHITELIST_PKT_FILTER */
+			printf("%s\n", dhd->pktfilter[i]);
 			dhd_pktfilter_offload_set(dhd, dhd->pktfilter[i]);
 			dhd_pktfilter_offload_enable(dhd, dhd->pktfilter[i],
 				value, dhd_master_mode);
@@ -1105,6 +1147,7 @@ dhd_op_if(dhd_if_t *ifp)
 		if (ifp->net != NULL) {
 			DHD_TRACE(("\n%s: got 'WLC_E_IF_DEL' state\n", __FUNCTION__));
 			netif_stop_queue(ifp->net);
+			unregister_netdev(ifp->net);
 			ret = DHD_DEL_IF;	/* Make sure the free_netdev() is called */
 		}
 		break;
@@ -1116,15 +1159,14 @@ dhd_op_if(dhd_if_t *ifp)
 
 	if (ret < 0) {
 		if (ifp->net) {
-			unregister_netdev(ifp->net);
 			free_netdev(ifp->net);
 		}
 		dhd->iflist[ifp->idx] = NULL;
-		MFREE(dhd->pub.osh, ifp, sizeof(*ifp));
 #ifdef SOFTAP
 		if (ifp->net == ap_net_dev)
 			ap_net_dev = NULL;   /*  NULL  SOFTAP global wl0.1 as well */
 #endif /*  SOFTAP */
+		MFREE(dhd->pub.osh, ifp, sizeof(*ifp));
 	}
 }
 
@@ -1410,7 +1452,7 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt)
 	struct sk_buff *skb;
 	uchar *eth;
 	uint len;
-	void *data, *pnext, *save_pktbuf;
+	void *data, *pnext = NULL, *save_pktbuf;
 	int i;
 	dhd_if_t *ifp;
 	wl_event_msg_t event;
@@ -1431,6 +1473,16 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt)
 		struct ether_header *eh;
 		struct dot11_llc_snap_header *lsh;
 #endif
+
+			ifp = dhd->iflist[ifidx];
+
+			/* Dropping packets before registering net device to avoid kernel panic */
+			if ((ifp->state == WLC_E_IF_DEL) || !ifp->net || ifp->net->reg_state != NETREG_REGISTERED) {
+					DHD_ERROR(("%s: net device is NOT registered yet. drop packet\n",
+					__FUNCTION__));
+					PKTFREE(dhdp->osh, pktbuf, TRUE);
+					continue;
+			}
 
 		pnext = PKTNEXT(dhdp->osh, pktbuf);
 		PKTSETNEXT(wl->sh.osh, pktbuf, NULL);
@@ -1516,7 +1568,7 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt)
 		skb_pull(skb, ETH_HLEN);
 
 		/* Process special event packets and then discard them */
-		if (ntoh16(skb->protocol) == ETHER_TYPE_BRCM)
+		if (ntoh16(skb->protocol) == ETHER_TYPE_BRCM) {
 			dhd_wl_host_event(dhd, &ifidx,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22)
 			skb->mac_header,
@@ -1532,7 +1584,9 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt)
 			dhd_bta_doevt(dhdp, data, event.datalen);
 		}
 #endif /* WLBTAMP */
+	}
 
+#if 0
 		/* Drop packets before registering net device to avoid kernel panic */
 		/* XXX Decide on a better way to avoid early packet */
 		if(!dhdp->netdev_registered){
@@ -1541,6 +1595,7 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt)
 			PKTFREE(dhdp->osh,pktbuf,TRUE);
 			continue;
 		}
+#endif
 
 		ASSERT(ifidx < DHD_MAX_IFS && dhd->iflist[ifidx]);
 		if (dhd->iflist[ifidx] && !dhd->iflist[ifidx]->state)
@@ -2604,6 +2659,11 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 	register_early_suspend(&dhd->early_suspend);
 	dhd_state |= DHD_ATTACH_STATE_EARLYSUSPEND_DONE;
 #endif
+
+#ifdef ARP_OFFLOAD_SUPPORT
+	register_inetaddr_notifier(&dhd_notifier);
+#endif /* ARP_OFFLOAD_SUPPORT */
+
 	dhd_state |= DHD_ATTACH_STATE_DONE;
 	dhd->dhd_state = dhd_state;
 	return &dhd->pub;
@@ -2774,7 +2834,7 @@ dhd_bus_start(dhd_pub_t *dhdp)
 		sprintf(&pkt_filter_cmd1[pf_offset], "0x%02x%02x%02x%02x%02x%02x"
 			, dhdp->mac.octet[0], dhdp->mac.octet[1], dhdp->mac.octet[2], dhdp->mac.octet[3], dhdp->mac.octet[4], dhdp->mac.octet[5]);
 
-		strcpy(pkt_filter_cmd2, "101 0 0 0 0xffffffffffff ");
+		strcpy(pkt_filter_cmd2, "102 0 0 0 0xffffffffffff ");
 		pf_offset=strlen(pkt_filter_cmd2);
 		sprintf(&pkt_filter_cmd2[pf_offset], "0x%02x%02x%02x%02x%02x%02x"
 			, dhdp->mac.octet[0]|0x02, dhdp->mac.octet[1], dhdp->mac.octet[2], dhdp->mac.octet[3], dhdp->mac.octet[4]^0x80, dhdp->mac.octet[5]);
@@ -2860,6 +2920,52 @@ int dhd_change_mtu(dhd_pub_t *dhdp, int new_mtu, int ifidx)
 	dev->mtu = new_mtu;
 	return 0;
 }
+
+#ifdef ARP_OFFLOAD_SUPPORT
+static int dhd_device_event(struct notifier_block *this,
+	unsigned long event,
+	void *ptr)
+{
+	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
+
+	dhd_info_t *dhd;
+	dhd_pub_t *dhd_pub;
+
+	if (!ifa)
+		return NOTIFY_DONE;
+
+	dhd = *(dhd_info_t **)netdev_priv(ifa->ifa_dev->dev);
+	dhd_pub = &dhd->pub;
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 31))
+	if (ifa->ifa_dev->dev->netdev_ops == &dhd_ops_pri) {
+#else
+	if (ifa->ifa_dev->dev) {
+#endif
+		switch (event) {
+		case NETDEV_UP:
+			DHD_ARPOE(("%s: [%s] Up IP: 0x%x\n",
+				__FUNCTION__, ifa->ifa_label, ifa->ifa_address));
+
+			if (dhd->pub.busstate != DHD_BUS_DATA) {
+				DHD_ERROR(("%s: bus not ready, exit\n", __FUNCTION__));
+				break;
+			}
+
+			dhd_aoe_hostip_clr(dhd_pub);
+			dhd_aoe_arp_clr(dhd_pub);
+			dhd_arp_offload_add_ip(dhd_pub, ifa->ifa_address);
+			break;
+
+		default:
+			DHD_ARPOE(("%s: do noting for [%s] Event: %lu\n",
+				__func__, ifa->ifa_label, event));
+			break;
+		}
+	}
+	return NOTIFY_DONE;
+}
+#endif /* ARP_OFFLOAD_SUPPORT */
 
 int
 dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
@@ -3029,6 +3135,10 @@ dhd_detach(dhd_pub_t *dhdp)
 		 */
 		osl_delay(1000*100);
 	}
+
+#ifdef ARP_OFFLOAD_SUPPORT
+	unregister_inetaddr_notifier(&dhd_notifier);
+#endif /* ARP_OFFLOAD_SUPPORT */
 
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 	if (dhd->dhd_state & DHD_ATTACH_STATE_EARLYSUSPEND_DONE)	{

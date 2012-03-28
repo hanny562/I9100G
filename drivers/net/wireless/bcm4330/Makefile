@@ -82,6 +82,8 @@ EXTRA_CFLAGS += -DUSE_INITIAL_2G_SCAN
 #MobileAP fw_reload
 EXTRA_CFLAGS += -DMOBILEAP_RELOAD
 
+# ARP offloading
+EXTRA_CFLAGS += -DARP_OFFLOAD_SUPPORT
 
 ###############################################################################################
 

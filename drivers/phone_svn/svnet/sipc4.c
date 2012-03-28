@@ -636,6 +636,11 @@ static int __write(struct ringbuf *rb, u8 *buf, unsigned int size)
 		return -EPERM;
 	}
 
+	if (buf == NULL) {
+		printk("__write : buf is null\n");
+		return -EPERM;
+	}
+
 	// no check space
 
 	_dbg("%s b: size %u head %u tail %u\n", __func__,

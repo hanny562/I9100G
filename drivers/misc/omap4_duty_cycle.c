@@ -44,16 +44,16 @@ enum omap4_duty_state {
 };
 
 /* state struct */
-static unsigned int nitro_interval = 20000;
+static unsigned int nitro_interval = 25000;
 module_param(nitro_interval, int, 0);
 
-static unsigned int nitro_percentage = 25;
+static unsigned int nitro_percentage = 20;
 module_param(nitro_percentage, int, 0);
 
 static unsigned int nitro_rate = 1200000;
 module_param(nitro_rate, int, 0);
 
-static unsigned int cooling_rate = 1008000;
+static unsigned int cooling_rate =800000;
 module_param(cooling_rate, int, 0);
 
 static int heating_budget;
@@ -89,7 +89,7 @@ static void omap4_duty_enter_normal(void)
 static void omap4_duty_exit_cool_wq(struct work_struct *work)
 {
 	mutex_lock(&mutex_duty);
-	pr_debug("%s enter at ()\n", __func__);
+	pr_info("%s enter at ()\n", __func__);
 
 	omap4_duty_enter_normal();
 	mutex_unlock(&mutex_duty);
@@ -116,7 +116,7 @@ static void omap4_duty_enter_cooling(unsigned int next_max,
 static void omap4_duty_exit_heating_wq(struct work_struct *work)
 {
 	mutex_lock(&mutex_duty);
-	pr_debug("%s enter at ()\n", __func__);
+	pr_info("%s enter at ()\n", __func__);
 
 	omap4_duty_enter_cooling(cooling_rate, OMAP4_DUTY_COOLING_0);
 	mutex_unlock(&mutex_duty);
@@ -155,6 +155,8 @@ static void omap4_duty_enter_heat_wq(struct work_struct *work)
 	mutex_lock(&mutex_duty);
 	pr_debug("%s enter at ()\n", __func__);
 
+	cancel_delayed_work(&work_exit_cool);
+
 	omap4_duty_enter_heating();
 	mutex_unlock(&mutex_duty);
 }
@@ -179,6 +181,7 @@ static int omap4_duty_frequency_change(struct notifier_block *nb,
 		break;
 	case OMAP4_DUTY_HEATING:
 		if (freqs->new < nitro_rate) {
+			cancel_delayed_work(&work_exit_heat);
 			heating_budget -= (t_next_heating_end - jiffies);
 			if (heating_budget <= 0)
 				queue_work(duty_wq, &work_enter_cool0);

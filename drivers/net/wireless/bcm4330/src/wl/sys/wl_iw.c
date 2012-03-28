@@ -1907,8 +1907,9 @@ iwpriv_set_ap_config(struct net_device *dev,
 		}
 
 		extra[wrqu->data.length] = 0;
+#ifdef BRCM_SECURITY_LOG
 		WL_SOFTAP((" Got str param in iw_point:\n %s\n", extra));
-
+#endif
 		memset(ap_cfg, 0, sizeof(struct ap_profile));
 
 		/*  parse param string and write extracted values into the ap_profile structure */
@@ -6633,8 +6634,10 @@ set_ap_cfg(struct net_device *dev, struct ap_profile *ap)
 	WL_SOFTAP(("wl_iw: set ap profile:\n"));
 	WL_SOFTAP(("	ssid = '%s'\n", ap->ssid));
 	WL_SOFTAP(("	security = '%s'\n", ap->sec));
+#ifdef BRCM_SECURITY_LOG
 	if (ap->key[0] != '\0')
-		WL_SOFTAP(("	key = '%s'\n", ap->key));
+		WL_SOFTAP(("	key = *\n"));
+#endif
 	WL_SOFTAP(("	channel = %d\n", ap->channel));
 	WL_SOFTAP(("	max scb = %d\n", ap->max_scb));
 #ifdef USE_HIDDEN_SSID
@@ -6866,8 +6869,10 @@ wl_iw_set_ap_security(struct net_device *dev, struct ap_profile *ap)
 	WL_SOFTAP(("wl_iw: set ap profile:\n"));
 	WL_SOFTAP(("	ssid = '%s'\n", ap->ssid));
 	WL_SOFTAP(("	security = '%s'\n", ap->sec));
+#ifdef BRCM_SECURITY_LOG
 	if (ap->key[0] != '\0')
-		WL_SOFTAP(("	key = '%s'\n", ap->key));
+		WL_SOFTAP(("	key = *\n"));
+#endif
 	WL_SOFTAP(("	channel = %d\n", ap->channel));
 	WL_SOFTAP(("	max scb = %d\n", ap->max_scb));
 
@@ -7109,8 +7114,9 @@ get_parameter_from_string(
 			parm_str_len = param_str_end - param_str_begin;
 		}
 
+#ifdef BRCM_SECURITY_LOG
 		WL_TRACE((" 'token:%s', len:%d, ", token, parm_str_len));
-
+#endif
 		if (parm_str_len > param_max_len) {
 			WL_ERROR((" WARNING: extracted param len:%d is > MAX:%d\n",
 				parm_str_len, param_max_len));

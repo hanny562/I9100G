@@ -1148,7 +1148,8 @@ static int mtpg_function_setup(struct usb_function *f,
 			| USB_PTPREQUEST_CANCELIO:
 			DEBUG_MTPB("[%s] USB_PTPREQUEST_CANCELIO \tline = [%d] \n", __func__,__LINE__);
 			DEBUG_MTPB("[%s] \tline = [%d]  w_value = %x,w_index = %x, w_length = %x\n",__func__, __LINE__, w_value, w_index, w_length);
-			if (w_value == 0x00 && w_index == mtpg_interface_desc.bInterfaceNumber && w_length == 0x06)
+			//if (w_value == 0x00 && w_index == mtpg_interface_desc.bInterfaceNumber && w_length == 0x06)
+			if (w_value == 0x00 && w_length == 0x06)
 			{
 				DEBUG_MTPB("[%s] read USB_PTPREQUEST_CANCELIO data \tline = [%d] \n", __func__,__LINE__);
 				value = w_length;

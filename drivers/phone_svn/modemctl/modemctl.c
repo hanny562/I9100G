@@ -251,6 +251,8 @@ static void infinion_on(struct modemctl *mc)
 	udelay(160);
 
 	gpio_set_value(mc->gpio_phone_on, 1);
+	udelay(60);
+	gpio_set_value(mc->gpio_phone_on, 0);
 
 	omap_writel(0x0B000B00, 0x4A100144);
 	dev_dbg(mc->dev, "[HW_REQ] AP FLM TX/RX SET MUX HIGH\n");

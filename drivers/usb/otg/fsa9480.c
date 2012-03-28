@@ -60,6 +60,8 @@
 #define FSA9480_REG_CK_INTMASK2                0x12
 #define FSA9480_REG_MANSW1             0x13
 #define FSA9480_REG_MANSW2             0x14
+#define FSA9480_REG_ON_PDDETECT               0x20
+
 
 /* MANSW1 */
 #define VAUDIO                 0x90
@@ -630,8 +632,11 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw, u8 intr)
 			if(isDeskdockconnected)
 			{
 				printk("[FSA9480] %s : Deskdock already inserted\n",__func__);
+				fsa9480_write_reg(client,FSA9480_REG_CTRL, 0x1E);
+				EnableFSA9480Interrupts();
 				return;
 			}
+
 			FSA9480_EnableIntrruptByMHL(false);
 			printk("[FSA9480] %s : MHL connected\n",__func__);
 
@@ -677,6 +682,7 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw, u8 intr)
                if ((usbsw->dev1 & FSA9480_DEV_T1_AUDIO_MASK)||(usbsw->dev2 & DEV_JIG_UART_ON)) {
                        if (pdata->cardock_cb)
                                pdata->cardock_cb(FSA9480_DETACHED);
+		       fsa9480_write_reg(client,FSA9480_REG_CTRL, 0x1E);
                }
 			   
 #endif
@@ -978,6 +984,10 @@ static int __devinit fsa9480_probe(struct i2c_client *client,
 
 	   /*set timing1 to 50ms*/
 	   fsa9480_write_reg(client, FSA9480_REG_TIMING1, 0x0);
+
+	   /*set enable DM/DP pull-down detection*/
+	   fsa9480_write_reg(client, FSA9480_REG_ON_PDDETECT, 0x0C);
+	   
 	   
 
        printk("[FSA9480] PROBE Done.\n");

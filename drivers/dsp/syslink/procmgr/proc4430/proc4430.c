@@ -564,7 +564,7 @@ int proc4430_detach(void *handle)
 			unmap_info.addr =
 				object->params.mem_entries[i].master_virt_addr;
 			unmap_info.size = object->params.mem_entries[i].size;
-            //unmap_info.is_cached = false;
+            unmap_info.is_cached = false;
 			printk(KERN_ERR "SHARED_REG_INFO: proc4430_detach unmap_info.addr [0x%x] unmap_info.size [0x%x]\n", unmap_info.addr, unmap_info.size);
 			platform_mem_unmap(&unmap_info);
 			object->params.mem_entries[i].master_virt_addr =

@@ -77,6 +77,7 @@
  *  ============================================================================
  */
 #define HW_AUTO 3
+#define SW_WKUP 2
 #define CM_DUCATI_M3_CLKSTCTRL 0x4A008900
 #define SL2_RESOURCE 10
 
@@ -847,6 +848,12 @@ int ipu_pm_notifications(int proc_id, enum pm_event_type event, void *data)
 	union message_slicer pm_msg;
 	int retval;
 	int pm_ack = 0;
+
+	if (recover) {
+		pr_debug("Event [%d] not sent to Proc [%d] during recovery\n",
+								event, proc_id);
+		return -EBUSY;
+	}
 
 	handle = ipu_pm_get_handle(proc_id);
 	if (WARN_ON(handle == NULL))
@@ -2277,6 +2284,7 @@ struct ipu_pm_object *ipu_pm_create(const struct ipu_pm_params *params)
 {
 	int i;
 	int retval = 0;
+	struct ipu_pm_object *pm_handle;
 
 	if (WARN_ON(unlikely(params == NULL))) {
 		retval = -EINVAL;
@@ -2284,121 +2292,125 @@ struct ipu_pm_object *ipu_pm_create(const struct ipu_pm_params *params)
 	}
 
 	if (params->remote_proc_id == SYS_M3) {
-		pm_handle_sysm3 = kmalloc(sizeof(struct ipu_pm_object),
+		pm_handle = kmalloc(sizeof(struct ipu_pm_object),
 						GFP_ATOMIC);
 
-		if (WARN_ON(unlikely(pm_handle_sysm3 == NULL))) {
+		if (WARN_ON(unlikely(pm_handle == NULL))) {
 			retval = -EINVAL;
 			goto exit;
 		}
 
-		pm_handle_sysm3->rcb_table = (struct sms *)params->shared_addr;
+		pm_handle->rcb_table = (struct sms *)params->shared_addr;
 
-		pm_handle_sysm3->pm_event = kzalloc(sizeof(struct pm_event)
+		pm_handle->pm_event = kzalloc(sizeof(struct pm_event)
 					* params->pm_num_events, GFP_KERNEL);
 
-		if (WARN_ON(unlikely(pm_handle_sysm3->pm_event == NULL))) {
+		if (WARN_ON(unlikely(pm_handle->pm_event == NULL))) {
 			retval = -EINVAL;
-			kfree(pm_handle_sysm3);
+			kfree(pm_handle);
 			goto exit;
 		}
 
 		/* Each event has it own sem */
 		for (i = 0; i < params->pm_num_events; i++) {
-			sema_init(&pm_handle_sysm3->pm_event[i].sem_handle, 0);
-			pm_handle_sysm3->pm_event[i].event_type = i;
+			sema_init(&pm_handle->pm_event[i].sem_handle, 0);
+			pm_handle->pm_event[i].event_type = i;
 		}
 
-		pm_handle_sysm3->params = kzalloc(sizeof(struct ipu_pm_params)
+		pm_handle->params = kzalloc(sizeof(struct ipu_pm_params)
 							, GFP_KERNEL);
 
-		if (WARN_ON(unlikely(pm_handle_sysm3->params == NULL))) {
+		if (WARN_ON(unlikely(pm_handle->params == NULL))) {
 			retval = -EINVAL;
-			kfree(pm_handle_sysm3->pm_event);
-			kfree(pm_handle_sysm3);
+			kfree(pm_handle->pm_event);
+			kfree(pm_handle);
 			goto exit;
 		}
 
-		memcpy(pm_handle_sysm3->params, params,
+		memcpy(pm_handle->params, params,
 			sizeof(struct ipu_pm_params));
 
 		/* Check the SW version on both sides */
-		if (WARN_ON(pm_handle_sysm3->rcb_table->pm_version !=
+		if (WARN_ON(pm_handle->rcb_table->pm_version !=
 						PM_VERSION))
 			pr_warning("Mismatch in PM version Host:0x%08x "
 					"Remote:0x%08x", PM_VERSION,
-					pm_handle_sysm3->rcb_table->pm_version);
+					pm_handle->rcb_table->pm_version);
 
-		spin_lock_init(&pm_handle_sysm3->lock);
-		INIT_WORK(&pm_handle_sysm3->work, ipu_pm_work);
+		spin_lock_init(&pm_handle->lock);
+		INIT_WORK(&pm_handle->work, ipu_pm_work);
 
-		if (!kfifo_alloc(&pm_handle_sysm3->fifo,
+		if (!kfifo_alloc(&pm_handle->fifo,
 				IPU_KFIFO_SIZE * sizeof(struct ipu_pm_msg),
-				GFP_KERNEL))
+				GFP_KERNEL)) {
+			pm_handle_sysm3 = pm_handle;
 			return pm_handle_sysm3;
+		}
 
 		retval = -ENOMEM;
-		kfree(pm_handle_sysm3->params);
-		kfree(pm_handle_sysm3->pm_event);
-		kfree(pm_handle_sysm3);
+		kfree(pm_handle->params);
+		kfree(pm_handle->pm_event);
+		kfree(pm_handle);
 	} else if (params->remote_proc_id == APP_M3) {
-		pm_handle_appm3 = kmalloc(sizeof(struct ipu_pm_object),
+		pm_handle = kmalloc(sizeof(struct ipu_pm_object),
 						GFP_ATOMIC);
 
-		if (WARN_ON(unlikely(pm_handle_appm3 == NULL))) {
+		if (WARN_ON(unlikely(pm_handle == NULL))) {
 			retval = -EINVAL;
 			goto exit;
 		}
 
-		pm_handle_appm3->rcb_table = (struct sms *)params->shared_addr;
+		pm_handle->rcb_table = (struct sms *)params->shared_addr;
 
-		pm_handle_appm3->pm_event = kzalloc(sizeof(struct pm_event)
+		pm_handle->pm_event = kzalloc(sizeof(struct pm_event)
 					* params->pm_num_events, GFP_KERNEL);
 
-		if (WARN_ON(unlikely(pm_handle_appm3->pm_event == NULL))) {
+		if (WARN_ON(unlikely(pm_handle->pm_event == NULL))) {
 			retval = -EINVAL;
-			kfree(pm_handle_appm3);
+			kfree(pm_handle);
 			goto exit;
 		}
 
 		/* Each event has it own sem */
 		for (i = 0; i < params->pm_num_events; i++) {
-			sema_init(&pm_handle_appm3->pm_event[i].sem_handle, 0);
-			pm_handle_appm3->pm_event[i].event_type = i;
+			sema_init(&pm_handle->pm_event[i].sem_handle, 0);
+			pm_handle->pm_event[i].event_type = i;
 		}
 
-		pm_handle_appm3->params = kzalloc(sizeof(struct ipu_pm_params)
+		pm_handle->params = kzalloc(sizeof(struct ipu_pm_params)
 						, GFP_KERNEL);
 
-		if (WARN_ON(unlikely(pm_handle_appm3->params == NULL))) {
+		if (WARN_ON(unlikely(pm_handle->params == NULL))) {
 			retval = -EINVAL;
-			kfree(pm_handle_appm3->pm_event);
-			kfree(pm_handle_appm3);
+			kfree(pm_handle->pm_event);
+			kfree(pm_handle);
 			goto exit;
 		}
 
-		memcpy(pm_handle_appm3->params, params,
+		memcpy(pm_handle->params, params,
 			sizeof(struct ipu_pm_params));
 
 		/* Check the SW version on both sides */
-		if (WARN_ON(pm_handle_appm3->rcb_table->pm_version !=
+		if (WARN_ON(pm_handle->rcb_table->pm_version !=
 						PM_VERSION))
 			pr_warning("Mismatch in PM version Host:0x%08x "
 					"Remote:0x%08x", PM_VERSION,
-					pm_handle_appm3->rcb_table->pm_version);
+					pm_handle->rcb_table->pm_version);
 
-		spin_lock_init(&pm_handle_appm3->lock);
-		INIT_WORK(&pm_handle_appm3->work, ipu_pm_work);
+		spin_lock_init(&pm_handle->lock);
+		INIT_WORK(&pm_handle->work, ipu_pm_work);
 
-		if (!kfifo_alloc(&pm_handle_appm3->fifo,
+		if (!kfifo_alloc(&pm_handle->fifo,
 				IPU_KFIFO_SIZE * sizeof(struct ipu_pm_msg),
-				GFP_KERNEL))
+				GFP_KERNEL)) {
+			pm_handle_appm3 = pm_handle;
 			return pm_handle_appm3;
+		}
 
 		retval = -ENOMEM;
-		kfree(pm_handle_appm3->params);
-		kfree(pm_handle_appm3->pm_event);
-		kfree(pm_handle_appm3);
+		kfree(pm_handle->params);
+		kfree(pm_handle->pm_event);
+		kfree(pm_handle);
 	} else
 		retval = -EINVAL;
 
@@ -2489,6 +2501,10 @@ int ipu_pm_save_ctx(int proc_id)
 	struct ipu_pm_object *handle;
 
 	mutex_lock(ipu_pm_state.gate_handle);
+	/* putting Ducati into SW_WKUP*/
+	cm_write_mod_reg(SW_WKUP, OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
+
 	/* Currently in recover, dont need to save */
 	if (recover)
 		goto exit;
@@ -2544,23 +2560,23 @@ int ipu_pm_save_ctx(int proc_id)
 			retval = rproc_sleep(app_rproc);
 			if (retval)
 				goto error;
-			cm_write_mod_reg(HW_AUTO,
-					 OMAP4430_CM2_CORE_MOD,
-					 OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 			handle->rcb_table->state_flag |= APP_PROC_DOWN;
 		}
 		pr_info("Sleep SYSM3\n");
 		retval = rproc_sleep(sys_rproc);
 		if (retval)
 			goto error;
-		cm_write_mod_reg(HW_AUTO,
-				 OMAP4430_CM2_CORE_MOD,
-				 OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 		handle->rcb_table->state_flag |= SYS_PROC_DOWN;
 
 		/* If there is a message in the mbox restore
 		 * immediately after save.
 		 */
+		if (ducati_iommu) {
+			iommu_save_ctx(ducati_iommu);
+			_is_iommu_up = 0;
+		} else
+			pr_err("Not able to save iommu");
+
 		if (ducati_mbox && PENDING_MBOX_MSG)
 			goto restore;
 
@@ -2569,11 +2585,7 @@ int ipu_pm_save_ctx(int proc_id)
 			_is_mbox_up = 0;
 		} else
 			pr_err("Not able to save mbox");
-		if (ducati_iommu) {
-			iommu_save_ctx(ducati_iommu);
-			_is_iommu_up = 0;
-		} else
-			pr_err("Not able to save iommu");
+
 	} else
 		goto error;
 #ifdef CONFIG_OMAP_PM
@@ -2583,9 +2595,14 @@ int ipu_pm_save_ctx(int proc_id)
 			pr_info("Unable to remove cstr on IPU\n");
 #endif
 exit:
+	cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
+
 	mutex_unlock(ipu_pm_state.gate_handle);
 	return 0;
 error:
+	cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 #ifdef CONFIG_SYSLINK_IPU_SELF_HIBERNATION
 	ipu_pm_timer_state(PM_HIB_TIMER_ON);
 #endif
@@ -2666,6 +2683,11 @@ int ipu_pm_restore_ctx(int proc_id)
 	 * and enable them if they were loaded.
 	*/
 	mutex_lock(ipu_pm_state.gate_handle);
+
+	cm_write_mod_reg(SW_WKUP,
+			OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
+
 	if (proc_id == SYS_M3 || proc_id == APP_M3) {
 		if (!(ipu_pm_get_state(proc_id) & SYS_PROC_DOWN))
 			goto exit;
@@ -2685,16 +2707,13 @@ int ipu_pm_restore_ctx(int proc_id)
 		retval = rproc_wakeup(sys_rproc);
 		if (retval)
 			goto error;
-		cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
-				 OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
+
 		handle->rcb_table->state_flag &= ~SYS_PROC_DOWN;
 		if (ipu_pm_get_state(proc_id) & APP_PROC_LOADED) {
 			pr_info("Wakeup APPM3\n");
 			retval = rproc_wakeup(app_rproc);
 			if (retval)
 				goto error;
-			cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
-				 OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 			handle->rcb_table->state_flag &= ~APP_PROC_DOWN;
 		}
 #ifdef CONFIG_OMAP_PM
@@ -2712,9 +2731,13 @@ exit:
 		global_rcb->pm_flags.hibernate_allowed)
 		ipu_pm_timer_state(PM_HIB_TIMER_ON);
 #endif
+	cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 	mutex_unlock(ipu_pm_state.gate_handle);
 	return retval;
 error:
+	cm_write_mod_reg(HW_AUTO, OMAP4430_CM2_CORE_MOD,
+			OMAP4_CM_DUCATI_CLKSTCTRL_OFFSET);
 	mutex_unlock(ipu_pm_state.gate_handle);
 	pr_debug("Aborting restoring process\n");
 	return -EINVAL;

@@ -1684,6 +1684,7 @@ WriteByteTPI(TPI_INTERRUPT_ENABLE_REG, 0x02);
 static	void	Int4Isr( void )
 {
 	byte		reg74;
+	unsigned int volatile value;
 
 	reg74 = I2C_ReadByte(SA_TX_Page0_Primary, (0x74));	// read status
 
@@ -1705,6 +1706,18 @@ static	void	Int4Isr( void )
 			MHL_On(0);
 			return;
 		}
+
+		/* generating force det by writing into phy register to take care of T1 hdmi 2% failure */
+		if (!mhl_wa_force_det){
+			value= omap_readl(0x4804630C);
+			value= value& 0xFFFF7FFF;
+			value= value| 0x00008000;
+			omap_writel(value, 0x4804630C);
+			value= omap_readl(0x4804630C);
+			mhl_wa_force_det =1;
+			printk(KERN_INFO " generating force connect %x \n", value);
+		}
+
     	        MASK_CBUS1_INTERRUPTS;
     	        MASK_CBUS2_INTERRUPTS;
 		//fwPowerState = TX_POWER_STATE_D0_MHL;
@@ -2970,10 +2983,11 @@ void sii9234_interrupt_event(void)
 	byte	eventParameter;
 	byte	flag;
 	byte	val;
-	unsigned int volatile value;
 	//int	loop_try = 0;
 
 	SII_DRV_DBG("Start mhl_cable_status=%d, fwPowerState=%d\n", (int)mhl_cable_status, (int)fwPowerState);
+	if (mhl_cable_status == MHL_INIT_POWER_OFF)
+		return;
 
 	do {
 		//
@@ -3059,18 +3073,6 @@ void sii9234_interrupt_event(void)
 		}
 
 	}while(flag);
-        /* generating force det by writing into phy register to take care of T1 hdmi 2% failure */
-	if (!mhl_wa_force_det){
-	value= omap_readl(0x4804630C);
-	value= value& 0xFFFF7FFF;
-	value= value| 0x00008000;
-	omap_writel(value, 0x4804630C);
-	value= omap_readl(0x4804630C);
-	mhl_wa_force_det =1;
-	printk(KERN_INFO " generating force connect %x \n", value);
-	}
-
-
 
 	SII_DRV_DBG( "[MHL]sii9234_interrupt_event :: flag: %x\n",(int) flag );
 }
