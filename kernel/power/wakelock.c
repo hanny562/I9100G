@@ -264,7 +264,7 @@ void debug_print_active_locks(int type)
 				printk(KERN_EMERG "%s(%d left), ", lock->name, timeout);
 		} else {
 			printk(KERN_EMERG "%s,", lock->name);
-			if (!debug_mask & DEBUG_EXPIRE)
+			if (!debug_mask && DEBUG_EXPIRE)
 				print_expired = false;
 		}
 	}
