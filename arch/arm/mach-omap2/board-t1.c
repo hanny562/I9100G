@@ -2025,7 +2025,7 @@ static u8 t7_config[] = {GEN_POWERCONFIG_T7,
 static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
 				10, 0, 5, 1, 0, 0, MXT224_ATCHCALST, MXT224_ATCHCALTHR};
 static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
-				131, 0, 0, 19, 11, 0, 32,  MXT224_THRESHOLD_BATT, 2, 1, 0, 15, 1,
+				131, 0, 0, 19, 11, 0, 32,  MXT224_THRESHOLD_BATT, 2, 1, 0, 0, 1,
 				MXT224_MOVFILTER_BATT, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
 				223, 1, 0, 0, 0, 0, 143, 55, 143, 90, 18};
 
@@ -2596,7 +2596,7 @@ static struct omap_volt_pmic_info omap_pmic_iva = {
 static struct omap_volt_vc_data vc_config = {
 	/*VDD_MPU*/
 	.vdd0_on = 1360000,	/* 1.375v */
-	.vdd0_onlp = 950000,	/* 1.375v */
+	.vdd0_onlp = 900000,	/* 1.375v */
 	.vdd0_ret = 750000,	/* 0.86v */
 	.vdd0_off = 0,		/* 0 v */
 	/*VDD_CORE*/

@@ -4374,15 +4374,15 @@ static struct omap_hwmod_ocp_if *omap44xx_smartreflex_mpu_slaves[] = {
 };
 
 static u32 omap44xx_sr_mpu_efuse_offs[] = {
-	OMAP44XX_CONTROL_FUSE_MPU_OPP50, OMAP44XX_CONTROL_FUSE_MPU_OPP50,
-	OMAP44XX_CONTROL_FUSE_MPU_OPP100, OMAP44XX_CONTROL_FUSE_MPU_OPPTURBO,
+	OMAP44XX_CONTROL_FUSE_MPU_OPP50, OMAP44XX_CONTROL_FUSE_MPU_OPP50, 
+	OMAP44XX_CONTROL_FUSE_MPU_OPP100, OMAP44XX_CONTROL_FUSE_MPU_OPPTURBO, 
 	OMAP44XX_CONTROL_FUSE_MPU_OPPNITRO, OMAP44XX_CONTROL_FUSE_MPU_OPPTNT,
-	OMAP44XX_CONTROL_FUSE_MPU_OPP200,
+	
 };
 
 
 static u32 omap44xx_sr_mpu_test_nvalues[] = {
-	0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+	0x0, 0x0, 0x0, 0x0, 0x0
 };
 
 static struct omap_sr_dev_data omap44xx_sr_mpu_dev_attr = {
