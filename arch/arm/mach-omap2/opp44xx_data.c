@@ -101,17 +101,17 @@ static struct omap_opp_def __initdata omap44xx_pre_es2_1_opp_def_list[] = {
 
 static struct omap_opp_def __initdata omap44xx_opp_def_list[] = {
 	/* MPU OPPLP - DPLL cascading */
-	OMAP_OPP_DEF("mpu", false, 196608000, 1011000),
+	OMAP_OPP_DEF("mpu", false, 196608000, 950000),
 	/* MPU OPP1 - OPP50 */
-	OMAP_OPP_DEF("mpu", true, 300000000, 1025000),
+	OMAP_OPP_DEF("mpu", true, 200000000, 975000),
 	/* MPU OPP2 - OPP100 */
-	OMAP_OPP_DEF("mpu", true, 600000000, 1200000),
+	OMAP_OPP_DEF("mpu", true, 600000000, 1150000),
 	/* MPU OPP3 - OPP-Turbo */
-	OMAP_OPP_DEF("mpu", true, 800000000, 1325000),
+	OMAP_OPP_DEF("mpu", true, 800000000, 1275000),
 	/* MPU OPP4 - OPP-SB */
-	OMAP_OPP_DEF("mpu", true, 1008000000, 1387000),
+	OMAP_OPP_DEF("mpu", true, 1008000000, 1359000),
 	/* MPU OPP4 - OPP-TNT */
-	OMAP_OPP_DEF("mpu", false, TNT_FREQ, 1388000),
+	OMAP_OPP_DEF("mpu", false, TNT_FREQ, 1360000),
 	/* IVA OPPLP - DPLL cascading */
 	OMAP_OPP_DEF("iva", true,  98304000, 948000),
 	/* IVA OPP1 - OPP50 */
