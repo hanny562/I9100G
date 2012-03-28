@@ -53,7 +53,7 @@ module_param(nitro_percentage, int, 0);
 static unsigned int nitro_rate = 1200000;
 module_param(nitro_rate, int, 0);
 
-static unsigned int cooling_rate =800000;
+static unsigned int cooling_rate =1200000;
 module_param(cooling_rate, int, 0);
 
 static int heating_budget;
