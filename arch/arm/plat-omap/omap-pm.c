@@ -622,10 +622,10 @@ int omap_pm_set_min_mpu_freq(struct device *dev, unsigned long f)
 		remove_req_tput(dev, mpu_tput);
 	} else {
 		struct cpufreq_policy policy;
-		cpufreq_get_policy(%policy, 0);
-		if (f/1000) < policy.min)
+		cpufreq_get_policy(&policy, 0);
+		if ((f/1000) < policy.min)
 			f = policy.min * 1000;
-		if (f/1000) > policy.max)
+		if ((f/1000) > policy.max)
 			f = policy.max * 1000;
 		add_req_tput(dev, f, mpu_tput);
 	}
