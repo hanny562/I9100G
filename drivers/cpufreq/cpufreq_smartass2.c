@@ -43,7 +43,7 @@
  * towards the ideal frequency and slower after it has passed it. Similarly,
  * lowering the frequency towards the ideal frequency is faster than below it.
  */
-#define DEFAULT_AWAKE_IDEAL_FREQ 600000
+#define DEFAULT_AWAKE_IDEAL_FREQ 768000
 static unsigned int awake_ideal_freq;
 
 /*
@@ -52,7 +52,7 @@ static unsigned int awake_ideal_freq;
  * that practically when sleep_ideal_freq==0 the awake_ideal_freq is used
  * also when suspended).
  */
-#define DEFAULT_SLEEP_IDEAL_FREQ 300000
+#define DEFAULT_SLEEP_IDEAL_FREQ 245760
 static unsigned int sleep_ideal_freq;
 
 /*
@@ -60,7 +60,7 @@ static unsigned int sleep_ideal_freq;
  * Zero disables and causes to always jump straight to max frequency.
  * When below the ideal freqeuncy we always ramp up to the ideal freq.
  */
-#define DEFAULT_RAMP_UP_STEP 200000
+#define DEFAULT_RAMP_UP_STEP 50000
 static unsigned int ramp_up_step;
 
 /*
@@ -68,13 +68,13 @@ static unsigned int ramp_up_step;
  * Zero disables and will calculate ramp down according to load heuristic.
  * When above the ideal freqeuncy we always ramp down to the ideal freq.
  */
-#define DEFAULT_RAMP_DOWN_STEP 300000
+#define DEFAULT_RAMP_DOWN_STEP 100000
 static unsigned int ramp_down_step;
 
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-#define DEFAULT_MAX_CPU_LOAD 55
+#define DEFAULT_MAX_CPU_LOAD 50
 static unsigned long max_cpu_load;
 
 /*
@@ -94,14 +94,14 @@ static unsigned long up_rate_us;
  * The minimum amount of time to spend at a frequency before we can ramp down.
  * Notice we ignore this when we are above the ideal frequency.
  */
-#define DEFAULT_DOWN_RATE_US 66000;
+#define DEFAULT_DOWN_RATE_US 99000;
 static unsigned long down_rate_us;
 
 /*
  * The frequency to set when waking up from sleep.
  * When sleep_ideal_freq=0 this will have no effect.
  */
-#define DEFAULT_SLEEP_WAKEUP_FREQ 1000000
+#define DEFAULT_SLEEP_WAKEUP_FREQ 99999999
 static unsigned int sleep_wakeup_freq;
 
 /*
@@ -668,6 +668,10 @@ static int cpufreq_governor_smartass(struct cpufreq_policy *new_policy,
 	unsigned int cpu = new_policy->cpu;
 	int rc;
 	struct smartass_info_s *this_smartass = &per_cpu(smartass_info, cpu);
+	unsigned int min_freq = ~0;
+	unsigned int max_freq = 0;
+	unsigned int i;
+	struct cpufreq_frequency_table *freq_table;
 
 	switch (event) {
 	case CPUFREQ_GOV_START:
@@ -700,6 +704,21 @@ static int cpufreq_governor_smartass(struct cpufreq_policy *new_policy,
 
 		if (this_smartass->cur_policy->cur < new_policy->max && !timer_pending(&this_smartass->timer))
 			reset_timer(cpu,this_smartass);
+
+		freq_table = cpufreq_frequency_get_table(new_policy->cpu);
+		for (i = 0; (freq_table[i].frequency != CPUFREQ_TABLE_END); i++) {
+			unsigned int freq = freq_table[i].frequency;
+			if (freq == CPUFREQ_ENTRY_INVALID) {
+				continue;
+			}
+			if (freq < min_freq)	
+				min_freq = freq;
+			if (freq > max_freq)
+				max_freq = freq;
+		}
+		sleep_wakeup_freq = freq_table[(i-1)/2].frequency > min_freq ? freq_table[(i-1)/2].frequency : max_freq;		//Value in midrange of available CPU frequencies if sufficient number of freq bins available
+		awake_ideal_freq = freq_table[(i-1)*3/4].frequency > min_freq ? freq_table[(i-1)/2].frequency : max_freq;		//Value in midrange of available CPU frequencies if sufficient number of freq bins available
+		sleep_ideal_freq = freq_table[1].frequency > max_freq ? min_freq : freq_table[1].frequency;		//Value just above minimum frequency
 
 		break;
 
@@ -866,5 +885,3 @@ module_exit(cpufreq_smartass_exit);
 MODULE_AUTHOR ("Erasmux");
 MODULE_DESCRIPTION ("'cpufreq_smartass2' - A smart cpufreq governor");
 MODULE_LICENSE ("GPL");
-
-
