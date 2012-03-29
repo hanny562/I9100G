@@ -2595,8 +2595,8 @@ static struct omap_volt_pmic_info omap_pmic_iva = {
 
 static struct omap_volt_vc_data vc_config = {
 	/*VDD_MPU*/
-	.vdd0_on = 1360000,	/* 1.375v */
-	.vdd0_onlp = 900000,	/* 1.375v */
+	.vdd0_on = 1350000,	/* 1.375v */
+	.vdd0_onlp = 850000,	/* 1.375v */
 	.vdd0_ret = 750000,	/* 0.86v */
 	.vdd0_off = 0,		/* 0 v */
 	/*VDD_CORE*/
