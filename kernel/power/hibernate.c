@@ -515,10 +515,6 @@ int hibernation_platform_enter(void)
 	/* We should never get here */
 	while (1);
 
-	/*
-	 * We don't need to reenable the nonboot CPUs or resume consoles, since
-	 * the system is going to be halted anyway.
-	 */
  Platform_finish:
 	hibernation_ops->finish();
 

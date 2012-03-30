@@ -73,6 +73,7 @@
  *	device are known to the PM core.  However, for some devices this
  *	attribute is set to "enabled" by bus type code or device drivers and in
  *	that cases it should be safe to leave the default value.
+ *
  */
 
 static const char enabled[] = "enabled";
