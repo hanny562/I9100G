@@ -2,7 +2,7 @@ VERSION = 2
 PATCHLEVEL = 6
 SUBLEVEL = 35
 EXTRAVERSION = .7
-NAME = Yokohama
+NAME = Lucifr-1.42uv-test3
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"

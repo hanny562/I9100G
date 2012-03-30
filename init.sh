@@ -13,8 +13,7 @@ if [ -e zImage ]; then
 fi
 
 echo "Cleaning latest build"
-make clean mrproper
-rm compile.log
+make clean -j4 mrproper
 
 make lucifr_defconfig
 
