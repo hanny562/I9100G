@@ -33,6 +33,10 @@ menu "Si4709 FM radio"
 source "samsung/fm_si4709/Kconfig"
 endmenu
 
+menu "Samsung J4FS Support"
+source "samsung/j4fs/Kconfig"
+endmenu
+
 menu "Samsung Param-Partition Support"
 source "samsung/param/Kconfig"
 endmenu

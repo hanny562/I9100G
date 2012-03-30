@@ -5,6 +5,8 @@
  *
  * COPYRIGHT(C) Samsung Electronics Co.Ltd. 2006-2010 All Right Reserved.
  *
+ * Author: Jeonghwan Min <jeonghwan.min@samsung.com>
+ *
  * 2008.02.26. Supprot for BML layer.
  * 2009.12.07. Modified to support for FSR_BML
  * 2010.04.22. Remove FSR_BML
