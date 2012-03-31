@@ -24,7 +24,7 @@ tar cf $KERNEL_PATH/arch/arm/boot/$FILENAME.tar ../../../zImage && ls -lh $FILEN
 
 cd ../../..
 cd release/zip
-zip -r $KBUILD_BUILD_VERSION.zip *
+zip -r $FILENAME.zip *
 
 cp $KERNEL_PATH/arch/arm/boot/$FILENAME.tar $KERNEL_PATH/release/tar/$FILENAME.tar
 rm $KERNEL_PATH/arch/arm/boot/$FILENAME.tar
