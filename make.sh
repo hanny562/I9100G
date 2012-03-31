@@ -1,1 +1,0 @@
-sudo ./init.sh
