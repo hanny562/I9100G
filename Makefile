@@ -2,7 +2,7 @@ VERSION = 2
 PATCHLEVEL = 6
 SUBLEVEL = 35
 EXTRAVERSION = .7
-NAME = Lucifr-1.42uv-test3
+NAME = Lucifr-1.5uv
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
@@ -950,7 +950,8 @@ define filechk_utsrelease.h
 endef
 
 define filechk_version.h
-	(echo \#define LINUX_VERSION_CODE $(shell                             \
+	(echo \#define LINUX_CODE_NAME \"$(NAME)\"; \
+	echo \#define LINUX_VERSION_CODE $(shell                             \
 	expr $(VERSION) \* 65536 + $(PATCHLEVEL) \* 256 + $(SUBLEVEL));     \
 	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';)
 endef
@@ -1153,7 +1154,7 @@ PHONY += distclean
 
 distclean: mrproper
 	@find $(srctree) $(RCS_FIND_IGNORE) \
-		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
+		\( -name '*.zip' -o -name '*.tar' -o -name '*.orig' -o -name '*.rej' -o -name '*~' \
 		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
 		-o -name '.*.rej' -o -size 0 \
 		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
