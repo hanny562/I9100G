@@ -105,7 +105,7 @@ static struct omap_board_mux __omap_board_core_mux[] __initdata = {
 	/* [IN---] gpmc_ad15 - gpio_39 - TA_CURRENT_SEL */
 	OMAP4_MUX(GPMC_AD15, OMAP_MUX_MODE3 | OMAP_PIN_INPUT_PULLUP),
 	/* [IN---] gpmc_a16 - gpio_40 - FM_INT */
-	OMAP4_MUX(GPMC_A16, OMAP_MUX_MODE3 | OMAP_PIN_INPUT_PULLUP | OMAP_PIN_OFF_WAKEUPENABLE), 
+	OMAP4_MUX(GPMC_A16, OMAP_MUX_MODE3 | OMAP_PIN_INPUT | OMAP_PIN_OFF_WAKEUPENABLE), 
 	/* [--OUT] gpmc_a17 - gpio_41 - 8M_ISP_INT */
 	OMAP4_MUX(GPMC_A17, OMAP_MUX_MODE3 | OMAP_PIN_INPUT),
 	/* [--OUT] gpmc_a18 - gpio_42 - FM_RST */

@@ -1743,8 +1743,8 @@ static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
 				64, 0, 20, 20, 0, 0, MXT224_ATCHCALST, MXT224_ATCHCALTHR, 50, 25};
 static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
 				131, 0, 0, 16, 26, 0, 160, MXT224_THRESHOLD_BATT, 2, 6, 0, 5, 1,
-				0, MXT224_MAX_MT_FINGERS, 10, 10, 5, 255, 3,
-				255, 3, 0, 0, 0, 0, 136, 60, 136, 40, 40, 15, 0, 0};
+				0, MXT224_MAX_MT_FINGERS, 10, 10, 5, 31, 3,
+				255, 4, 0, 0, 0, 0, 136, 60, 136, 40, 40, 15, 0, 0};
 
 static u8 t15_config[] = {TOUCH_KEYARRAY_T15,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1805,8 +1805,8 @@ static u8 t8_config_e[] = {GEN_ACQUISITIONCONFIG_T8,
 
 static u8 t9_config_e[] = {TOUCH_MULTITOUCHSCREEN_T9,
 				139, 0, 0, 16, 26, 0, 176, MXT224E_THRESHOLD_BATT, 2, 6, 10, 3, 1,
-				48, MXT224_MAX_MT_FINGERS, 5, 40, 15, 255, 3,
-				255, 3, 0, 0, 0, 0, 0, 0, 0, 0, 18, 15, 0, 0, 2};
+				48, MXT224_MAX_MT_FINGERS, 5, 40, 15, 31, 3,
+				255, 4, 0, 0, 0, 0, 0, 0, 0, 0, 18, 15, 0, 0, 2};
 
 static u8 t15_config_e[] = {TOUCH_KEYARRAY_T15,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -1884,9 +1884,9 @@ static struct mxt224_platform_data mxt224_data = {
 	.config = mxt224_config,
 	.config_e = mxt224e_config,
 	.min_x = 0,
-	.max_x = 1023,
+	.max_x = 799,
 	.min_y = 0,
-	.max_y = 1023,
+	.max_y = 1279,
 	.min_z = 0,
 	.max_z = 255,
 	.min_w = 0,

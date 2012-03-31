@@ -121,15 +121,8 @@ int rproc_sleep(struct omap_rproc *rproc)
 {
 	int ret;
 	struct omap_rproc_platform_data *pdata;
-	int cpu_id = smp_processor_id();
-	printk("rproc_sleep_ENTRY: %d\n",cpu_id);
-	if(rproc == NULL)
-		printk("*************NULL pointer %d\n",cpu_id);
-	
 	if (!rproc->dev)
 		return -EINVAL;
-	
-	printk("rproc_sleep_1: %d\n",cpu_id);
 
 	pdata = rproc->dev->platform_data;
 	if (!pdata->ops)
@@ -138,14 +131,11 @@ int rproc_sleep(struct omap_rproc *rproc)
 	ret = mutex_lock_interruptible(&rproc->lock);
 	if (ret)
 		return ret;
-	
-	printk("rproc_sleep_2: %d\n",cpu_id);
 
 	ret = pdata->ops->sleep(rproc->dev);
 
 	mutex_unlock(&rproc->lock);
 
-	printk("rproc_sleep_EXIT: %d\n",cpu_id);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(rproc_sleep);

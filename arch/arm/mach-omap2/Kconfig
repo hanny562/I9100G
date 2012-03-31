@@ -283,7 +283,7 @@ config MACH_SAMSUNG_P2
 	select MACH_OMAP4_SAMSUNG
 
 config MACH_SAMSUNG_Q1
-	bool "Samsung Q1 (GT-I9220) Board"
+	bool "Samsung Q1 (GT-I9221) Board"
 	default n
 	select MACH_OMAP4_SAMSUNG
 
@@ -491,3 +491,6 @@ config OMAP4_KEEP_STATIC_DEPENDENCIES
 	default n
 	help
 	  Select this option to keep the static dependency mapping for OMAP4.
+
+config SND_SOC_CHN_CALL_REC
+     tristate 

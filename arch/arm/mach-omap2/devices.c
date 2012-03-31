@@ -354,12 +354,21 @@ static struct platform_device omap_abe_dai = {
 	.id	= -1,
 };
 
+#if defined(CONFIG_SND_SOC_CHN_CALL_REC)
+static struct platform_device omap_abe_vxrec = { 
+	.name = "omap-abe-vxrec-dai", 
+	.id   = -1, 	
+};
+#endif
 static inline void omap_init_abe(void)
 {
 	platform_device_register(&codec_dmic0);
 	platform_device_register(&codec_dmic1);
 	platform_device_register(&codec_dmic2);
 	platform_device_register(&omap_abe_dai);
+#if defined(CONFIG_SND_SOC_CHN_CALL_REC)
+        platform_device_register(&omap_abe_vxrec);
+#endif
 }
 #else
 static inline void omap_init_abe(void) {}

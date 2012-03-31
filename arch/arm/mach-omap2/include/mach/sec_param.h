@@ -103,6 +103,10 @@ typedef struct {
 extern void (*sec_set_param_value) (int idx, void *value);
 extern void (*sec_get_param_value) (int idx, void *value);
 
+#if defined(CONFIG_MACH_T1_CHN)
+extern int alarm_en_exit; // defense_code_bsystar_for_alarmboot 110730
+#endif
+
 #define USB_SEL_MASK			(1 << 0)
 #define UART_SEL_MASK			(1 << 1)
 
