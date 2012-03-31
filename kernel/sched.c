@@ -425,6 +425,7 @@ struct rt_rq {
  */
 struct root_domain {
 	atomic_t refcount;
+	struct rcu_head rcu;
 	cpumask_var_t span;
 	cpumask_var_t online;
 
