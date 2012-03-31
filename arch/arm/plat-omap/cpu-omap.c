@@ -142,7 +142,7 @@ static int omap_target(struct cpufreq_policy *policy,
 	if ( freq > 1008000000 && freqs.old*1000 < 1008000000 )
 		target_freq = 1008000;
 
-	freqs.new = target_freq*1000;//clk_round_rate(mpu_clk, target_freq * 1000) / 1000;
+	freqs.new = target_freq*1000;//clk_round_rate(mpu_clk, target_freq * 1000) / 1000; //
 	opp_find_freq_ceil(mpu_dev, &freqs.new);
 	freqs.new /=1000;
 

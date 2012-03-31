@@ -685,6 +685,7 @@ struct omap_overlay_manager {
 	int (*apply)(struct omap_overlay_manager *mgr);
 	int (*wait_for_go)(struct omap_overlay_manager *mgr);
 	int (*wait_for_vsync)(struct omap_overlay_manager *mgr);
+	bool (*get_transient_state)(struct omap_overlay_manager *mgr);
 
 	int (*enable)(struct omap_overlay_manager *mgr);
 	int (*disable)(struct omap_overlay_manager *mgr);

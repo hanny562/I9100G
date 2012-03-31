@@ -271,18 +271,49 @@ static struct switch_dev switch_dock = {
 
 static void omap4_deskdock_cb(bool attached)
 {
-	if (attached)
+	union power_supply_propval value;
+	struct power_supply *psy = power_supply_get_by_name("sec-charger");
+	int ret;
+	
+	printk("\nBoard file [FSA9480]: DESK DOCK Callback \n");
+	
+	if (attached) {
 		switch_set_state(&switch_dock, 1);
-	else
+		value.intval = POWER_SUPPLY_TYPE_CARDOCK;
+	}
+	else {
 		switch_set_state(&switch_dock, 0);
+		value.intval = POWER_SUPPLY_TYPE_BATTERY;
+	}
+
+	if (psy) {
+		ret = psy->set_property(psy, POWER_SUPPLY_PROP_CHARGE_TYPE, &value);
+		if (ret)
+			printk("%s: fail to set power_supply property\n", __func__);
+	}
 }
 
 static void omap4_cardock_cb(bool attached)
 {
-	if (attached)
+	union power_supply_propval value;
+	struct power_supply *psy = power_supply_get_by_name("sec-charger");
+	int ret;
+	
+	printk("\nBoard file [FSA9480]: CARKIT Callback \n");
+
+	if (attached) {
 		switch_set_state(&switch_dock, 2);
-	else
+		value.intval = POWER_SUPPLY_TYPE_CARDOCK;
+	} else {
 		switch_set_state(&switch_dock, 0);
+		value.intval = POWER_SUPPLY_TYPE_BATTERY;
+	}
+	
+	if (psy) {
+		ret = psy->set_property(psy, POWER_SUPPLY_PROP_CHARGE_TYPE, &value);
+		if (ret)
+			printk("%s: fail to set power_supply property\n", __func__);
+	}
 }
 #endif
 
@@ -1986,7 +2017,7 @@ static void mxt224_read_ta_status(bool *ta_status)
 #define MXT224_NOISE_THRESHOLD_CHRG		40
 #define MXT224_MOVFILTER_BATT		11
 #define MXT224_MOVFILTER_CHRG		46
-#define MXT224_ATCHCALST		9
+#define MXT224_ATCHCALST		5
 #define MXT224_ATCHCALTHR		30
 
 static u8 t7_config[] = {GEN_POWERCONFIG_T7,
@@ -1994,7 +2025,7 @@ static u8 t7_config[] = {GEN_POWERCONFIG_T7,
 static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
 				10, 0, 5, 1, 0, 0, MXT224_ATCHCALST, MXT224_ATCHCALTHR};
 static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
-				131, 0, 0, 19, 11, 0, 32,  MXT224_THRESHOLD_BATT, 2, 1, 0, 15, 1,
+				131, 0, 0, 19, 11, 0, 32,  MXT224_THRESHOLD_BATT, 2, 1, 0, 0, 1,
 				MXT224_MOVFILTER_BATT, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
 				223, 1, 0, 0, 0, 0, 143, 55, 143, 90, 18};
 
@@ -2024,29 +2055,24 @@ static const u8 *mxt224_config[] = {
 	Configuration for MXT224-E
 */
 #define MXT224E_THRESHOLD_BATT		50
-#define MXT224E_THRESHOLD_CHRG		70
+#define MXT224E_THRESHOLD_CHRG		40
 #define MXT224E_CALCFG_BATT		72
-#define MXT224E_CALCFG_CHRG		88
+#define MXT224E_CALCFG_CHRG		82
 #define MXT224E_ATCHFRCCALTHR_NORMAL		40
 #define MXT224E_ATCHFRCCALRATIO_NORMAL		55
+#define MXT224_GHRGTIME_BATT		27
+#define MXT224_GHRGTIME_CHRG		22
 
 static u8 t7_config_e[] = {GEN_POWERCONFIG_T7,
 				48, 255, 25};
 
 static u8 t8_config_e[] = {GEN_ACQUISITIONCONFIG_T8,
-				27, 0, 5, 1, 0, 0, 5, 30, MXT224E_ATCHFRCCALTHR_NORMAL, MXT224E_ATCHFRCCALRATIO_NORMAL};
+				MXT224_GHRGTIME_BATT, 0, 5, 1, 0, 0, MXT224_ATCHCALST, MXT224_ATCHCALTHR, MXT224E_ATCHFRCCALTHR_NORMAL, MXT224E_ATCHFRCCALRATIO_NORMAL};
 
-#if defined(CONFIG_MACH_T1_CHN)
-static u8 t9_config_e[] = {TOUCH_MULTITOUCHSCREEN_T9,
-				139, 0, 0, 19, 11, 0, 32, MXT224E_THRESHOLD_BATT, 2, 1, 10, 15, 1,
-				11, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
-				223, 1, 10, 10, 10, 10, 143, 40, 143, 80, 18, 15, 50, 50, 2};
-#else
 static u8 t9_config_e[] = {TOUCH_MULTITOUCHSCREEN_T9,
 				139, 0, 0, 19, 11, 0, 32, MXT224E_THRESHOLD_BATT, 2, 1, 10, 3, 1,
 				11, MXT224_MAX_MT_FINGERS, 5, 40, 10, 31, 3,
 				223, 1, 10, 10, 10, 10, 143, 40, 143, 80, 18, 15, 50, 50, 2};
-#endif
 
 static u8 t15_config_e[] = {TOUCH_KEYARRAY_T15,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -2076,16 +2102,16 @@ static u8 t47_config_e[] = {PROCI_STYLUS_T47,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static u8 t48_config_e[] = {PROCG_NOISESUPPRESSION_T48,
-				3, 4, MXT224E_CALCFG_BATT, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-				6,	6, 0, 0, 100, 4, 64, 10, 0, 20, 5, 0, 38, 0, 5,
+				3, 132, MXT224E_CALCFG_BATT, 29, 0, 0, 0, 10, 15, 0, 0, 0, 0,
+				6,	6, 0, 0, 64, 4, 64, 10, 0, 20, 5, 0, 38, 0, 5,
 				0, 0, 0, 0, 0, 0, 32, MXT224E_THRESHOLD_BATT, 2, 3, 1, 11, MXT224_MAX_MT_FINGERS, 5, 40, 10, 10,
 				10, 10, 143, 40, 143, 80, 18, 15, 2 };
 
 static u8 t48_config_chrg_e[] = {PROCG_NOISESUPPRESSION_T48,
-				1, 4, MXT224E_CALCFG_CHRG, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-				6,	6, 0, 0, 100, 4, 64, 10, 0, 20, 5, 0, 38, 0, 20,
-				0, 0, 0, 0, 0, 0, 16, MXT224E_THRESHOLD_CHRG, 2, 5, 2, 46, MXT224_MAX_MT_FINGERS, 5, 40, 10, 0,
-				10, 10, 143, 40, 143, 80, 18, 15, 2 };
+				3, 132, MXT224E_CALCFG_CHRG, 0, 0, 0, 0, 10, 15, 0, 0, 0, 0,
+				6,	6, 0, 0, 64, 4, 64, 10, 0, 20, 5, 0, 38, 0, 20,
+				0, 0, 0, 0, 0, 0, 0, MXT224E_THRESHOLD_CHRG, 2, 5, 2, 46, MXT224_MAX_MT_FINGERS, 5, 40, 15, 10,
+				10, 10, 143, 40, 143, 80, 18, 15, 0 };
 
 static u8 end_config_e[] = {RESERVED_T255};
 
@@ -2134,6 +2160,8 @@ static struct mxt224_platform_data mxt224_data = {
 	.calcfg_charging_e = MXT224E_CALCFG_CHRG,
 	.atchfrccalthr_e = MXT224E_ATCHFRCCALTHR_NORMAL,
 	.atchfrccalratio_e = MXT224E_ATCHFRCCALRATIO_NORMAL,
+	.chrgtime_batt_e = MXT224_GHRGTIME_BATT,
+	.chrgtime_charging_e = MXT224_GHRGTIME_CHRG,
 	.t48_config_batt_e = t48_config_e,
 	.t48_config_chrg_e = t48_config_chrg_e,
 	.power_on = mxt224_power_on,
@@ -2567,19 +2595,19 @@ static struct omap_volt_pmic_info omap_pmic_iva = {
 
 static struct omap_volt_vc_data vc_config = {
 	/*VDD_MPU*/
-	.vdd0_on = 1375000,	/* 1.375v */
-	.vdd0_onlp = 1375000,	/* 1.375v */
-	.vdd0_ret = 860000,	/* 0.86v */
+	.vdd0_on = 1350000,	/* 1.375v */
+	.vdd0_onlp = 850000,	/* 1.375v */
+	.vdd0_ret = 750000,	/* 0.86v */
 	.vdd0_off = 0,		/* 0 v */
 	/*VDD_CORE*/
-	.vdd1_on = 1200000,	/* 1.2v */
-	.vdd1_onlp = 1200000,	/* 1.2v */
-	.vdd1_ret = 860000,	/* 0.86v */
+	.vdd1_on = 1291000,	/* 1.2v */
+	.vdd1_onlp = 950000,	/* 1.2v */
+	.vdd1_ret = 750000,	/* 0.86v */
 	.vdd1_off = 0,		/* 0 v */
 	/*VDD_IVA*/
-	.vdd2_on = 1188000,	/* 1.188v */
-	.vdd2_onlp = 1188000,	/* 1.188v */
-	.vdd2_ret = 860000,	/* .86v */
+	.vdd2_on = 1127000,	/* 1.188v */
+	.vdd2_onlp = 962000,	/* 1.188v */
+	.vdd2_ret = 750000,	/* .86v */
 	.vdd2_off = 0,		/* 0 v */
 };
 

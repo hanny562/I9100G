@@ -152,11 +152,19 @@ void omap4_check_clk_idle_state(void)
 	return;
 }
 
+#if defined(CONFIG_MACH_T1_CHN)
+u32 power_on_alarm_check;
+EXPORT_SYMBOL(power_on_alarm_check);
+#endif
+
 void omap4_check_gpio_wkup_state(void)
 {
 	u32 reg_addr = 0;
 	u32 reg_val = 0;
 	u16 count = 0;
+#if defined(CONFIG_MACH_T1_CHN)
+	power_on_alarm_check = 0;
+#endif
 
 #if 0
 	/* Check PRM_IRQSTATUS_MPU_A9, PRM_IRQSTATUS_MPU_A9_2 registers */
@@ -172,6 +180,12 @@ void omap4_check_gpio_wkup_state(void)
 	if (reg_val) {
 		pr_err("[MPU irq status2] 0x%08X=0x%08X\n",
 			reg_addr, reg_val);
+	}
+#endif
+
+#if defined(CONFIG_MACH_T1_CHN)
+	if(omap_readl(0x4A1001EC) & 0x2000) {
+		power_on_alarm_check = 1;
 	}
 #endif
 
@@ -273,6 +287,13 @@ void omap4_trigger_ioctrl(void)
 	/* Trigger WUCLKIN disable */
 	prm_rmw_mod_reg_bits(OMAP4430_WUCLK_CTRL_MASK, 0x0,
 		OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_IO_PMCTRL_OFFSET);
+
+	i=0;
+	omap_test_timeout(
+		!(prm_read_mod_reg(OMAP4430_PRM_DEVICE_MOD,
+				OMAP4_PRM_IO_PMCTRL_OFFSET)
+			& OMAP4430_WUCLK_STATUS_MASK),
+		MAX_IOPAD_LATCH_TIME, i);
 	return;
 }
 
@@ -341,8 +362,8 @@ void omap4_enter_sleep(unsigned int cpu, unsigned int power_state)
 	int per_next_state = PWRDM_POWER_ON;
 	int core_next_state = PWRDM_POWER_ON;
 	int mpu_next_state = PWRDM_POWER_ON;
+	int volatile val;
 
-u32 val;
 
 	pwrdm_clear_all_prev_pwrst(cpu0_pwrdm);
 	pwrdm_clear_all_prev_pwrst(mpu_pwrdm);
@@ -402,9 +423,12 @@ u32 val;
 
 		if (!omap4_device_off_read_next_state()) {
 			/* Enable AUTO RET for IVA and CORE */
+#if 0
 			prm_rmw_mod_reg_bits(OMAP4430_AUTO_CTRL_VDD_IVA_L_MASK,
 			0x2 << OMAP4430_AUTO_CTRL_VDD_IVA_L_SHIFT,
 			OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_VOLTCTRL_OFFSET);
+#endif
+
 			prm_rmw_mod_reg_bits(OMAP4430_AUTO_CTRL_VDD_CORE_L_MASK,
 			0x2 << OMAP4430_AUTO_CTRL_VDD_CORE_L_SHIFT,
 			OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_VOLTCTRL_OFFSET);
@@ -428,6 +452,15 @@ u32 val;
 		omap4_sar_save();
 		omap4_sar_overwrite();
 	}
+
+	/* warm reset rst time1 */
+	val = omap_readl(0x4a307b08);	
+	val = val & 0xFFFFFc00;
+	val = val | 0x0000015e;
+	omap_writel(val , 0x4a307b08);
+
+	/* warm voltset warm reset */
+	omap_writel(0xFFFFFFFF , 0x4a307b24);
 
 	omap4_enter_lowpower(cpu, power_state);
 
@@ -475,9 +508,12 @@ u32 val;
 
 		if (!omap4_device_off_read_next_state()) {
 				/* Disable AUTO RET for IVA and CORE */
+#if 0
 			prm_rmw_mod_reg_bits(OMAP4430_AUTO_CTRL_VDD_IVA_L_MASK,
 			0x0,
 			OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_VOLTCTRL_OFFSET);
+#endif
+
 			prm_rmw_mod_reg_bits(OMAP4430_AUTO_CTRL_VDD_CORE_L_MASK,
 			0x0,
 			OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_VOLTCTRL_OFFSET);
@@ -578,12 +614,14 @@ static irqreturn_t prcm_interrupt_handler (int irq, void *dev_id)
 #ifdef CONFIG_SUSPEND
 static int omap4_pm_prepare(void)
 {
-	u32 reg_val = 0;
+	u32 volatile reg_val = 0;
+	u32 volatile status = 0;
 
-	/* WA : System can't enter off mode beacause of tesla. */
+	u32 max_time_us = 100;
+	/* WA : System can't enter off mode because of tesla. */
 
 	/* Read PM_DSP_PWRSTST register */
-	reg_val = omap_readl(0x4A306404);
+	reg_val = omap_readl(0x4A306404) & 0x00100003;
 
 	if (reg_val != 0x00000000) {
 		pr_err("Turn off tesla power domain!!\n");
@@ -591,13 +629,30 @@ static int omap4_pm_prepare(void)
 		 * before modifying PM_DSP_PWRSTCTRL register */
 		omap_writel(0x00000002, 0x4A004400);
 
+		status = omap_readl(0x4A306404);
+		while(((status & 0x3) == 0x0) && max_time_us--) {
+			status = omap_readl(0x4A306404);
+			udelay(1);
+		}
+
 		/* Switch PM_DSP_PWRSTCTRL - ON & OFF */
-		omap_writel(0x003F0703, 0x4A306400);
-		omap_writel(0x003F0700, 0x4A306400);
+		//omap_writel(0x003F0703, 0x4A306400);
+		//omap_writel(0x003F0700, 0x4A306400);
 
 		/* Put CM_DSP_CLKSTCTRL in HW_AUTO */
 		omap_writel(0x00000003, 0x4A004400);
+
+		// wait until DSP power status shows OFF
+		max_time_us = 100;
+		status = omap_readl(0x4A306404);
+		while(((status & 0x3) == 0x3) && max_time_us--) {
+			status = omap_readl(0x4A306404);
+			udelay(1);
+		}
+
 	}
+
+		/* Switch PM_DSP_PWRSTCTRL - ON & OFF */
 
 	/* Turn off TWL6030 LDO before entering suspend */
 	twl6030_suspend_ldo_off();
@@ -707,13 +762,7 @@ static int omap4_pm_suspend(void)
 
 	gic_dist_pending_show_all();
 
-	prm_write_mod_reg(0x2, OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_PWRREQCTRL_OFFSET);
-
-	force_mux_offmode_setting();
 	omap4_enter_sleep(0, PWRDM_POWER_OFF);
-	restore_mux_offmode_setting();
-
-	prm_write_mod_reg(0x3, OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_PWRREQCTRL_OFFSET);
 
 	/* Check wakeup event */
 	omap4_check_gpio_wkup_state();
@@ -878,11 +927,6 @@ void omap4_pm_off_mode_enable(int enable)
 				 pwrst->pwrdm->name);
 			continue;
 		}
-		if( !enable && !strcmp(pwrst->pwrdm->name, "abe_pwrdm")) {
-			state = PWRDM_POWER_OFF;
-			logic_state = PWRDM_POWER_OFF;
-		}
-
 		pwrdm_set_logic_retst(pwrst->pwrdm, logic_state);
 		if ((state == PWRDM_POWER_OFF) &&
 				!(pwrst->pwrdm->pwrsts & (1 << state)))
@@ -995,7 +1039,7 @@ static void __init prcm_setup_regs(void)
 		OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_LDO_SRAM_IVA_SETUP_OFFSET);
 
 	/* Toggle CLKREQ in RET and OFF states */
-	prm_write_mod_reg(0x2, OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_CLKREQCTRL_OFFSET);
+	prm_write_mod_reg(0x3, OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_CLKREQCTRL_OFFSET);
 
 	/*
 	 * De-assert PWRREQ signal in Device OFF state
@@ -1007,20 +1051,9 @@ static void __init prcm_setup_regs(void)
 	prm_write_mod_reg(0x3, OMAP4430_PRM_DEVICE_MOD,
 				OMAP4_PRM_PWRREQCTRL_OFFSET);
 
-#if 0
-	/*
-	 * Set SRAM MPU/CORE/IVA LDO RETMODE
-	 */
-	prm_rmw_mod_reg_bits(OMAP4430_RETMODE_ENABLE_MASK,
-		0x1 << OMAP4430_RETMODE_ENABLE_SHIFT,
-		OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_LDO_SRAM_CORE_CTRL_OFFSET);
-	prm_rmw_mod_reg_bits(OMAP4430_RETMODE_ENABLE_MASK,
-		0x1 << OMAP4430_RETMODE_ENABLE_SHIFT,
-		OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_LDO_SRAM_MPU_CTRL_OFFSET);
-	prm_rmw_mod_reg_bits(OMAP4430_RETMODE_ENABLE_MASK,
-		0x1 << OMAP4430_RETMODE_ENABLE_SHIFT,
-		OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_LDO_SRAM_IVA_CTRL_OFFSET);
-#endif
+
+	prm_rmw_mod_reg_bits(OMAP4430_AUTO_CTRL_VDD_IVA_L_MASK,
+			0x0, OMAP4430_PRM_DEVICE_MOD, OMAP4_PRM_VOLTCTRL_OFFSET);
 }
 
 /**
