@@ -8,12 +8,10 @@ KERNEL_PATH="/home/hanny/kernel/Lucifr"
 # Set toolchain and root filesystem path
 TOOLCHAIN=""
 ROOTFS_PATH="/home/hanny/kernel/initramfs"
-<<<<<<< HEAD
 
 export KBUILD_BUILD_VERSION="Lucifr_1.51-test1"
 =======
 FILENAME="Lucifr_1.5uv"
->>>>>>> 6190a1a09b7a96ac7e5897688b2c0b8922668035
 export KERNELDIR=$KERNEL_PATH
 
 echo "Compiling Kernel"
