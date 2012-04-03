@@ -335,6 +335,13 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
+NEAK_FLAGS   = -marm -march=armv7-a -mfloat-abi=hard \
+			   -mcpu=cortex-a9 -mfpu=vfp3 \
+			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
+			   -ffast-math -ftree-vectorize \
+			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
+			   -fipa-cp-clone -pipe \
+			   -Wno-array-bounds
 MODFLAGS	= -DMODULE
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
@@ -342,7 +349,6 @@ LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
 CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
-
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
@@ -360,7 +366,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks
+		   -fno-delete-null-pointer-checks $(LUC_FLAGS)
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
