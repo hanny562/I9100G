@@ -2,7 +2,7 @@
 
 # Set Default Path
 TOP_DIR=$PWD
-KERNEL_PATH="/home/hanny/kernel/Lucifr"
+KERNEL_PATH="/home/hanny/kernel/Lucifr_old"
 
 # Set toolchain and root filesystem path
 TOOLCHAIN=""
