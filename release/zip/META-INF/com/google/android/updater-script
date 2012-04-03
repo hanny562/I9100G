@@ -7,12 +7,16 @@ show_progress(0.100000, 40);
 ui_print("* Flashing Lucifr kernel *");
 
 mount("ext4", "EMMC", "/dev/block/mmcblk0p9", "/system");
+ui_print("Clearing Cache");
+delete_recursive("/cache");
 assert(package_extract_file("zImage", "/tmp/zImage"),
 show_progress(0.100000, 70);
 write_raw_image("/tmp/zImage", "/dev/block/mmcblk0p5"),
 show_progress(0.100000, 90);
 delete("/tmp/zImage"));
 delete_recursive("/data/lucifr");
+ui_print("Clearing Cache");
+delete_recursive("/cache");
 unmount("/system");
 
 show_progress(0.100000, 100);

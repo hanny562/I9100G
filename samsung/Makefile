@@ -25,6 +25,7 @@
 
 obj-$(CONFIG_SAMSUNG_BATTERY)	+= battery/
 obj-$(CONFIG_FMRADIO)	+= fm_si4709/
+obj-$(CONFIG_SAMSUNG_J4FS)	+= j4fs/
 obj-$(CONFIG_SAMSUNG_PARAM)	+= param/
 obj-$(CONFIG_SAMSUNG_VIBETONZ)	+= vibetonz/
 

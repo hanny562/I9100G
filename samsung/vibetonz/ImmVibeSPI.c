@@ -87,8 +87,10 @@ static int g_pwmvalue=PWM_DUTY_MAX;
 
 static struct omap_dm_timer *gptimer;	/*For OMAP4430 "gptimer"*/
 
+#if defined(CONFIG_MACH_T1_CHN)
 static DEFINE_SPINLOCK(gptimer_lock);
 static bool gptimer_reg_set;
+#endif
 
 static ssize_t pwmvalue_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -300,6 +302,64 @@ IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_Terminate(void)
 ** Called by the real-time loop to set PWM duty cycle
 */
 
+#if !defined(CONFIG_MACH_T1_CHN)	
+IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_SetSamples(VibeUInt8 nActuatorIndex,
+							VibeUInt16 nOutputSignalBitDepth,
+							VibeUInt16 nBufferSizeInBytes,
+							VibeInt8 * pForceOutputBuffer)
+{
+	VibeInt8 nForce;
+	int pwm_duty;
+
+	switch (nOutputSignalBitDepth) {
+	case 8:
+		/* pForceOutputBuffer is expected to contain 1 byte */
+		if (nBufferSizeInBytes != 1) {
+			DbgOut((KERN_ERR "[ImmVibeSPI] ImmVibeSPI_ForceOut_SetSamples nBufferSizeInBytes =  %d\n", nBufferSizeInBytes));
+			return VIBE_E_FAIL;
+		}
+		nForce = pForceOutputBuffer[0];
+		break;
+	case 16:
+		/* pForceOutputBuffer is expected to contain 2 byte */
+		if (nBufferSizeInBytes != 2)
+			return VIBE_E_FAIL;
+
+		/* Map 16-bit value to 8-bit */
+		nForce = ((VibeInt16 *)pForceOutputBuffer)[0] >> 8;
+		break;
+	default:
+		/* Unexpected bit depth */
+		return VIBE_E_FAIL;
+	}
+
+	if (nForce == 0) {
+		/* Set 50% duty cycle or disable amp */
+		ImmVibeSPI_ForceOut_AmpDisable(0);
+		omap_dm_timer_enable(gptimer);
+		omap_dm_timer_stop(gptimer);
+	} else {
+		ImmVibeSPI_ForceOut_AmpEnable(0);
+/*
+ * Formula for matching the user space force (-127 to +127) to Duty cycle.
+ * Duty cycle will vary from 0 to 45('0' means 0% duty cycle,'45' means
+ * 100% duty cycle.Also if user space force equals to -127 then duty cycle will be 0
+ * (0%),if force equals to 0 duty cycle will be 22.5(50%),if +127 then duty cycle will
+ * be 45(100%)
+ */
+		 pwm_duty = ((nForce + 128) * (g_pwmvalue>>1)/128);
+            
+		if (g_pwmvalue>0)
+		{
+			vibtonz_GPTimerSetValue(g_pwmvalue, pwm_duty); /* set the duty according to the modify value later */
+		}
+		omap_dm_timer_start(gptimer);  /* start the GPtimer */
+	}
+
+	return VIBE_S_SUCCESS;
+}
+
+#else
 IMMVIBESPIAPI VibeStatus ImmVibeSPI_ForceOut_SetSamples(VibeUInt8 nActuatorIndex,
 							VibeUInt16 nOutputSignalBitDepth,
 							VibeUInt16 nBufferSizeInBytes,
@@ -369,6 +429,7 @@ error_vibe:
 	spin_unlock(&gptimer_lock);
 	return VIBE_E_FAIL;
 }
+#endif
 
 #if 0	/* Unused */
 /*
