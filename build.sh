@@ -9,8 +9,6 @@ KERNEL_PATH="/home/hanny/kernel/Lucifr"
 TOOLCHAIN=""
 ROOTFS_PATH="/home/hanny/kernel/initramfs"
 
-export KBUILD_BUILD_VERSION="Lucifr_1.51-test1"
-=======
 FILENAME="Lucifr_1.5uv"
 export KERNELDIR=$KERNEL_PATH
 
