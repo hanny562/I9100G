@@ -48,6 +48,7 @@
 #include <linux/wakelock.h>
 #include <linux/io.h>
 
+#include <linux/mfd/twl6040-codec.h>
 #include "../../drivers/staging/android/timed_output.h"
 #include "tspdrv.h"
 #include "ImmVibeSPI.c"
@@ -114,7 +115,7 @@ static DECLARE_WORK(vibetonz_work, _set_vibetonz_work);
 
 
 static struct hrtimer timer;
-static int max_timeout = 5000;
+static int max_timeout = 5000; /*5000*/
 
 
 static int vibrator_value;
