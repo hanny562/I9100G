@@ -9,7 +9,7 @@ KERNEL_PATH="/home/hanny/kernel/Lucifr"
 TOOLCHAIN=""
 ROOTFS_PATH="/home/hanny/kernel/initramfs"
 
-FILENAME="Lucifr_1.5uv"
+FILENAME="Lucifr_1.51uv"
 export KERNELDIR=$KERNEL_PATH
 
 echo "Compiling Kernel"
