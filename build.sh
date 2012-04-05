@@ -9,7 +9,7 @@ KERNEL_PATH="/home/hanny/kernel/Lucifr"
 TOOLCHAIN=""
 ROOTFS_PATH="/home/hanny/kernel/initramfs"
 
-FILENAME="Lucifr_1.51uv"
+FILENAME="Lucifr_1.52uv"
 export KERNELDIR=$KERNEL_PATH
 
 echo "Compiling Kernel"
@@ -27,6 +27,11 @@ tar cf $KERNEL_PATH/arch/arm/boot/$FILENAME.tar ../../../zImage && ls -lh $FILEN
 cd ../../..
 cd release/zip
 zip -r $FILENAME.zip *
+cp -f $KERNEL_PATH/release/zip/$FILENAME.zip $KERNEL_PATH/release/signed
+
+cd ../
+cd signed
+java -jar signapk.jar testkey.x509.pem testkey.pk8 $FILENAME.zip signed_$FILENAME.zip
 
 cp $KERNEL_PATH/arch/arm/boot/$FILENAME.tar $KERNEL_PATH/release/tar/$FILENAME.tar
 rm $KERNEL_PATH/arch/arm/boot/$FILENAME.tar
