@@ -29,6 +29,7 @@ modules.builtin
 *.bz2
 *.lzma
 *.lzo
+*.xz
 *.patch
 *.gcno
 *.tar
@@ -83,6 +84,11 @@ GTAGS
 # files for XZ compression
 arch/arm/boot/compressed/ashldi3.S
 arch/arm/boot/compressed/piggy.xzkern
+
+# Ignore signapk
+release/signed/signapk.jar
+release/signed/testkey.pk8
+release/signed/testkey.x509.pem
 
 *.orig
 *~
