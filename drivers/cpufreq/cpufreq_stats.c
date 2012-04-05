@@ -308,7 +308,7 @@ static int cpufreq_stat_notifier_trans(struct notifier_block *nb,
 
 static int cpufreq_stats_create_table_cpu(unsigned int cpu)
 {
-	struct cpufreq_policy *policyl
+	struct cpufreq_policy *policy;
 	struct cpufreq_frequency_table *table;
 	int ret = -ENODEV;
 
@@ -322,7 +322,7 @@ static int cpufreq_stats_create_table_cpu(unsigned int cpu)
 
 out:
 	cpufreq_cpu_put(policy);
-	return retl
+	return ret;
 }
 
 static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
@@ -341,7 +341,7 @@ static int __cpuinit cpufreq_stat_cpu_callback(struct notifier_block *nfb,
 		cpufreq_stats_free_table(cpu);
 		break;
 	case CPU_DOWN_FAILED:
-	case CPU_DOWN_FAILED:
+	case CPU_DOWN_FAILED_FROZEN:
 		cpufreq_stats_create_table_cpu(cpu);
 		break;
 	}

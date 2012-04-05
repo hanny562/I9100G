@@ -18,6 +18,7 @@ make -j2 CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
 # Copy Kernel Image
 rm -f $KERNEL_PATH/release/zip/*.zip
 rm -f $KERNEL_PATH/release/tar/*.tar
+rm -f $KERNEL_PATH/release/signed/*.zip
 cp -f $KERNEL_PATH/arch/arm/boot/zImage .
 cp -f $KERNEL_PATH/arch/arm/boot/zImage $KERNEL_PATH/release/zip
 
