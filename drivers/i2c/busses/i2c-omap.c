@@ -77,6 +77,7 @@ enum {
 	OMAP_I2C_REVNB_LO,
 	OMAP_I2C_REVNB_HI,
 	OMAP_I2C_IRQSTATUS_RAW,
+	OMAP_I2C_IRQSTATUS,
 	OMAP_I2C_IRQENABLE_SET,
 	OMAP_I2C_IRQENABLE_CLR,
 };
@@ -257,6 +258,7 @@ const static u8 omap4_reg_map[] = {
 	[OMAP_I2C_REVNB_LO] = 0x00,
 	[OMAP_I2C_REVNB_HI] = 0x04,
 	[OMAP_I2C_IRQSTATUS_RAW] = 0x24,
+	[OMAP_I2C_IRQSTATUS] = 0x28
 	[OMAP_I2C_IRQENABLE_SET] = 0x2c,
 	[OMAP_I2C_IRQENABLE_CLR] = 0x30,
 };
@@ -343,7 +345,7 @@ static void omap_i2c_idle(struct omap_i2c_dev *dev)
 
 	dev->iestate = omap_i2c_read_reg(dev, OMAP_I2C_IE_REG);
 	if (dev->rev >= OMAP_I2C_REV_ON_4430)
-		omap_i2c_write_reg(dev, OMAP_I2C_IRQENABLE_CLR, 1);
+		omap_i2c_write_reg(dev, OMAP_I2C_IRQENABLE_CLR, 0x6FFF);
 	else
 		omap_i2c_write_reg(dev, OMAP_I2C_IE_REG, 0);
 
