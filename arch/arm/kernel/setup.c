@@ -595,7 +595,10 @@ __tagtable(ATAG_REVISION, parse_tag_revision);
 #ifndef CONFIG_CMDLINE_FORCE
 static int __init parse_tag_cmdline(const struct tag *tag)
 {
+	int size;
 	strlcpy(default_command_line, tag->u.cmdline.cmdline, COMMAND_LINE_SIZE);
+	size = strlen(default_command_line);
+	size += sprintf(default_command_line + size, " vram=32M omapfb.vram=0:16M");
 	return 0;
 }
 
