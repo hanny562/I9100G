@@ -168,6 +168,7 @@ static __inline char __sec_common_convert_reboot_mode(char mode,
 		{"arm9_fota", 'f'},
 		{"recovery", 'r'},
 		{"download", 'd'},
+		{"bootloader", 'b'},	
 		{"cp_crash", 'C'}
 	};
 	size_t i, n;
@@ -238,6 +239,9 @@ int sec_common_update_reboot_reason(char mode, const char *cmd)
 		reason = REBOOTMODE_SHUTDOWN;
 		break;
 	case 'd':		/* reboot mode = download */
+		reason = REBOOTMODE_DOWNLOAD;
+		break;
+	case 'b': 		/*reboot mode = bootloader */
 		reason = REBOOTMODE_DOWNLOAD;
 		break;
 	default:		/* reboot mode = normal */
