@@ -335,8 +335,7 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-NEAK_FLAGS   = -marm -march=armv7-a -mfloat-abi=hard \
-			   -mcpu=cortex-a9 -mfpu=vfp3 \
+LUC_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a \
 			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
 			   -ffast-math -ftree-vectorize \
 			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
