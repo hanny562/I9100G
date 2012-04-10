@@ -2,7 +2,7 @@ VERSION = 2
 PATCHLEVEL = 6
 SUBLEVEL = 35
 EXTRAVERSION = .7
-NAME = Lucifr_1.54uv-200Mhz
+NAME = Lucifr_1.55uv-test2
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
