@@ -651,7 +651,7 @@ static int mmc_suspend(struct mmc_host *host)
 	BUG_ON(!host->card);
 
 	mmc_claim_host(host);
-	if (mmc_host_can_sleep(host))
+	if (mmc_card_can_sleep(host))
 		err = mmc_card_sleep(host);
 	else if (!mmc_host_is_spi(host))
 		mmc_deselect_cards(host);
