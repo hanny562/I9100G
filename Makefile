@@ -2,7 +2,7 @@ VERSION = 2
 PATCHLEVEL = 6
 SUBLEVEL = 35
 EXTRAVERSION = .7
-NAME = Lucifr_1.55uv-test2
+NAME = Lucifr_1.55uv-test3
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
@@ -335,7 +335,7 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-LUC_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a \
+LUC_FLAGS   = -marm -mtune=cortex-a9 -march=armv7-a -mfloat-abi=hard \
 			   -fsched-spec-load -floop-interchange -floop-strip-mine -floop-block \
 			   -ffast-math -ftree-vectorize \
 			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload -fno-tree-vectorize \
