@@ -132,6 +132,14 @@ config CPU_FREQ_DEFAULT_GOV_AGGRESSIVE
         	This features earlysuspend, hotplugging,
         	and tweaks to make it more aggressive.
 
+config CPU_FREQ_DEFAULT_GOV_AGGRESSIVEX
+	bool "aggressiveX"
+	select CPU_FREQ_GOV_AGGRESSIVEX
+	help
+	A modified conservative governor.
+        This features earlysuspend, hotplugging,
+        and tweaks to make it more aggressive.
+
 config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRY
 	bool "gallimaufry"
 	select CPU_FREQ_GOV_GALLIMAUFRY
@@ -139,6 +147,14 @@ config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRY
 	 A pimped out ondemand governor.
          This features earlysuspend, hotplugging, a
          2-phase algo, and tweaks to make it more aggressive.
+
+config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRYX
+	bool "gallimaufryX"
+	select CPU_FREQ_GOV_GALLIMAUFRYX
+	help
+	A modified ondemand governor.
+        This features earlysuspend, hotplugging, a
+        2-phase algo, and tweaks to make it more aggressive.
 
 config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	bool "interactive"
@@ -301,14 +317,30 @@ config CPU_FREQ_GOV_AGGRESSIVE
 	tristate "'aggressive' governor"
   	depends on CPU_FREQ
 	help
-	   Help is a lie.
+	  'aggressive' - this governor is a modified conservative.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_AGGRESSIVEX
+	tristate "'aggressiveX' governor"
+  depends on CPU_FREQ
+	help
+	  'aggressiveX' - this governor is a modified conservative with 
+	   screen-off hotplugging support.
 	   If in doubt, say N.
 
 config CPU_FREQ_GOV_GALLIMAUFRY
 	tristate "'gallimaufry' governor"
   	depends on CPU_FREQ
 	help
-	   Help is a lie.
+	  'gallimaufry' - this governor is a modified ondemand.
+	   If in doubt, say N.
+
+config CPU_FREQ_GOV_GALLIMAUFRYX
+	tristate "'gallimaufryX' governor"
+  	depends on CPU_FREQ
+	help
+	  'gallimaufryX' - this governor is a modified ondemand with 
+	   screen-off hotplugging support.
 	   If in doubt, say N.
 
 config CPU_FREQ_GOV_INTERACTIVE
