@@ -414,7 +414,7 @@ static int omap_i2c_init(struct omap_i2c_dev *dev)
 						"for controller reset\n");
 				return -ETIMEDOUT;
 			}
-			msleep(1);
+			usleep_range(500, 1000);
 		}
 
 		/* SYSC register is cleared by the reset; rewrite it */
@@ -586,7 +586,7 @@ static int omap_i2c_wait_for_bb(struct omap_i2c_dev *dev)
 			dev_warn(dev->dev, "timeout waiting for bus ready\n");
 			return -ETIMEDOUT;
 		}
-		msleep(1);
+		usleep_range(250, 500);
 	}
 
 	return 0;
