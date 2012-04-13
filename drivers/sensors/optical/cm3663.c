@@ -487,6 +487,10 @@ static ssize_t cm3663_light_enable_store(struct device *dev,
 		}	
 		cm3663->power_state |= LIGHT_ENABLED;
 		cm3663_light_enable(cm3663);
+		if(!((cm3663->power_state)&PROXIMITY_ENABLED)) {
+			cm3663_i2c_write(cm3663, REGS_PS_CMD, 0x01);
+
+		}
 	} else {
 		cm3663_light_disable(cm3663);
 		cm3663->power_state &= ~LIGHT_ENABLED;
@@ -1098,6 +1102,7 @@ static int cm3663_suspend(struct device *dev)
 	
   	if (!(cm3663->power_state & PROXIMITY_ENABLED)) {
   		printk("\n cm3663_suspend proximity_power false\n ");
+		cm3663_i2c_write(cm3663, REGS_PS_CMD, 0x01);
   		cm3663->pdata->proximity_power(false);
   	}	
   	printk("\n cm3663_suspend- \n");
@@ -1116,6 +1121,7 @@ static int cm3663_resume(struct device *dev)
   	if (!(cm3663->power_state & PROXIMITY_ENABLED)) {
   		printk("\n cm3663_resume proximity_power ture \n");
   		cm3663->pdata->proximity_power(true);
+		//cm3663_i2c_write(cm3663, REGS_PS_CMD, 0x01);
   	} else {
   		wake_lock_timeout(&cm3663->prx_wake_lock, 3*HZ);
   	}
