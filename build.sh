@@ -9,11 +9,11 @@ KERNEL_PATH="/home/hanny/kernel/Lucifr"
 TOOLCHAIN=""
 ROOTFS_PATH="/home/hanny/kernel/initramfs"
 
-FILENAME="Lucifr_1.55uv-test6"
+FILENAME="Lucifr_1.6uv-300Mhz"
 export KERNELDIR=$KERNEL_PATH
 
 echo "Compiling Kernel"
-make -j2 CONFIG_INITRAMFS_SOURCE="$ROOTFS_PATH" || exit -1
+make -j4 CONFIG_INITRAMFS_SOURCE="&ROOTFS_PATH" || exit -1
 
 # Copy Kernel Image
 rm -f $KERNEL_PATH/release/zip/*.zip
