@@ -1074,6 +1074,11 @@ static int cpufreq_add_dev(struct sys_device *sys_dev)
 		goto err_unlock_policy;
 	}
 
+	if (policy->max > 1200000) {
+		pr_info("cpufreq policy max set to 1.2Ghz at boot");
+		policy->max = 1200000;
+	}
+
 	policy->user_policy.min = policy->min;
 	policy->user_policy.max = policy->max;
 

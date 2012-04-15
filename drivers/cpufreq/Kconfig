@@ -133,7 +133,7 @@ config CPU_FREQ_DEFAULT_GOV_AGGRESSIVE
         	and tweaks to make it more aggressive.
 
 config CPU_FREQ_DEFAULT_GOV_AGGRESSIVEX
-	bool "aggressiveX"
+	bool "aggressivex"
 	select CPU_FREQ_GOV_AGGRESSIVEX
 	help
 	A modified conservative governor.
@@ -149,7 +149,7 @@ config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRY
          2-phase algo, and tweaks to make it more aggressive.
 
 config CPU_FREQ_DEFAULT_GOV_GALLIMAUFRYX
-	bool "gallimaufryX"
+	bool "gallimaufryx"
 	select CPU_FREQ_GOV_GALLIMAUFRYX
 	help
 	A modified ondemand governor.
